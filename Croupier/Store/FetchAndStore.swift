@@ -1,6 +1,6 @@
 import Foundation
 
-public class SourceAndStoreRepository<SourceType: Repository, StoreType: Repository>: Repository where SourceType.ModelType == StoreType.ModelType {
+public final class SourceAndStoreRepository<SourceType: Repository, StoreType: Repository>: Repository where SourceType.ModelType == StoreType.ModelType {
 
     public typealias ModelType = SourceType.ModelType
 
@@ -12,12 +12,11 @@ public class SourceAndStoreRepository<SourceType: Repository, StoreType: Reposit
         self.store = store
     }
 
-    public func get(key: String,
+    public func get(forKey key: String,
                     options: [String : String]?,
                     completion: @escaping (Result<ModelType, Error>) -> Void) {
 
-        source.get(key: key, options: options) { (result) in
-
+        source.get(forKey: key, options: options) { (result) in
             if case .success(let item) = result {
                 self.store.store(item: item, forKey: key) { (result) in
                     completion(result)
@@ -29,7 +28,7 @@ public class SourceAndStoreRepository<SourceType: Repository, StoreType: Reposit
         }
     }
 
-    public func getAll(completion: (Result<[ModelType], Error>) -> Void) {
+    public func getAll(completion: @escaping (Result<[ModelType], Error>) -> Void) {
 
         source.getAll { (result) in
 
@@ -42,15 +41,14 @@ public class SourceAndStoreRepository<SourceType: Repository, StoreType: Reposit
         }
     }
 
-    public func delete(item: ModelType,
-                       key: String,
-                       completion: ((Result<ModelType, Error>) -> Void)?) {
+    public func delete(forKey key: String,
+                       completion: ((Result<ModelType?, Error>) -> Void)?) {
 
-        source.delete(item: item, key: key) { (result) in
+        source.delete(forKey: key) { (result) in
 
             if case .success = result {
 
-                self.delete(item: item, key: key, completion: { (result) in
+                self.delete(forKey: key, completion: { (result) in
                     completion?(result)
                 })
             } else {

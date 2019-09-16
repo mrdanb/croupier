@@ -8,17 +8,16 @@ public enum RepositoryError: Error {
 
 public protocol Repository {
 
-    associatedtype ModelType: Codable
+    associatedtype ModelType
 
-    func get(key: String,
+    func get(forKey key: String,
              options: [String: String]?,
              completion: @escaping (Result<ModelType, Error>) -> Void)
 
-    func getAll(completion: (Result<[ModelType], Error>) -> Void)
+    func getAll(completion: @escaping (Result<[ModelType], Error>) -> Void)
 
-    func delete(item: ModelType,
-                key: String,
-                completion: ((Result<ModelType, Error>) -> Void)?)
+    func delete(forKey key: String,
+                completion: ((Result<ModelType?, Error>) -> Void)?)
 
     func store(item: ModelType,
                forKey key: String,

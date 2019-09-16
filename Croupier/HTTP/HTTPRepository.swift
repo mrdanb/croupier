@@ -1,6 +1,6 @@
 import Foundation
 
-public class HTTPRepository<ModelType: Codable>: Repository {
+public final class HTTPRepository<ModelType>: Repository where ModelType: Codable {
 
     private let baseUrl: URL
     private let httpClient: HTTPClient
@@ -11,7 +11,7 @@ public class HTTPRepository<ModelType: Codable>: Repository {
         self.httpClient = httpClient
     }
 
-    public func get(key: String,
+    public func get(forKey key: String,
                     options: [String: String]? = nil,
                     completion: @escaping (Result<ModelType, Error>) -> Void) {
 
@@ -35,9 +35,8 @@ public class HTTPRepository<ModelType: Codable>: Repository {
         fatalError("Unimplemented")
     }
 
-    public func delete(item: ModelType,
-                       key: String,
-                       completion: ((Result<ModelType, Error>) -> Void)?) {
+    public func delete(forKey key: String,
+                       completion: ((Result<ModelType?, Error>) -> Void)?) {
         fatalError("Unimplemented")
     }
 

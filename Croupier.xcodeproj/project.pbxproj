@@ -14,7 +14,24 @@
 		01DC2462232C150200F9B56E /* HTTPRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC2461232C150200F9B56E /* HTTPRepository.swift */; };
 		01DC2465232C152000F9B56E /* InMemoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC2464232C152000F9B56E /* InMemoryStore.swift */; };
 		01DC2468232C153B00F9B56E /* FetchAndStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC2467232C153B00F9B56E /* FetchAndStore.swift */; };
+		01DC247A232C1A0600F9B56E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC2479232C1A0600F9B56E /* AppDelegate.swift */; };
+		01DC247C232C1A0600F9B56E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC247B232C1A0600F9B56E /* ViewController.swift */; };
+		01DC247F232C1A0600F9B56E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 01DC247D232C1A0600F9B56E /* Main.storyboard */; };
+		01DC2482232C1A0700F9B56E /* CroupierExample.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 01DC2480232C1A0600F9B56E /* CroupierExample.xcdatamodeld */; };
+		01DC2484232C1A0800F9B56E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 01DC2483232C1A0800F9B56E /* Assets.xcassets */; };
+		01DC2487232C1A0800F9B56E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 01DC2485232C1A0800F9B56E /* LaunchScreen.storyboard */; };
+		01DC2490232C1B1F00F9B56E /* CoreDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC248F232C1B1F00F9B56E /* CoreDataRepository.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		01DC248C232C1A3000F9B56E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 01DC2445232C145000F9B56E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 01DC244D232C145000F9B56E;
+			remoteInfo = Croupier;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		01DC244E232C145000F9B56E /* Croupier.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Croupier.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -26,10 +43,26 @@
 		01DC2461232C150200F9B56E /* HTTPRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPRepository.swift; sourceTree = "<group>"; };
 		01DC2464232C152000F9B56E /* InMemoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InMemoryStore.swift; sourceTree = "<group>"; };
 		01DC2467232C153B00F9B56E /* FetchAndStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchAndStore.swift; sourceTree = "<group>"; };
+		01DC2477232C1A0600F9B56E /* CroupierExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CroupierExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		01DC2479232C1A0600F9B56E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		01DC247B232C1A0600F9B56E /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		01DC247E232C1A0600F9B56E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		01DC2481232C1A0700F9B56E /* CroupierExample.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CroupierExample.xcdatamodel; sourceTree = "<group>"; };
+		01DC2483232C1A0800F9B56E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		01DC2486232C1A0800F9B56E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		01DC2488232C1A0800F9B56E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		01DC248F232C1B1F00F9B56E /* CoreDataRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataRepository.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		01DC244B232C145000F9B56E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		01DC2474232C1A0600F9B56E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -43,6 +76,7 @@
 			isa = PBXGroup;
 			children = (
 				01DC2450232C145000F9B56E /* Croupier */,
+				01DC2478232C1A0600F9B56E /* CroupierExample */,
 				01DC244F232C145000F9B56E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -51,6 +85,7 @@
 			isa = PBXGroup;
 			children = (
 				01DC244E232C145000F9B56E /* Croupier.framework */,
+				01DC2477232C1A0600F9B56E /* CroupierExample.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -58,6 +93,7 @@
 		01DC2450232C145000F9B56E /* Croupier */ = {
 			isa = PBXGroup;
 			children = (
+				01DC248E232C1B0B00F9B56E /* CoreData */,
 				01DC2466232C153200F9B56E /* Store */,
 				01DC2463232C151400F9B56E /* InMemory */,
 				01DC245C232C14D100F9B56E /* HTTP */,
@@ -102,6 +138,28 @@
 			path = Store;
 			sourceTree = "<group>";
 		};
+		01DC2478232C1A0600F9B56E /* CroupierExample */ = {
+			isa = PBXGroup;
+			children = (
+				01DC2479232C1A0600F9B56E /* AppDelegate.swift */,
+				01DC247B232C1A0600F9B56E /* ViewController.swift */,
+				01DC247D232C1A0600F9B56E /* Main.storyboard */,
+				01DC2483232C1A0800F9B56E /* Assets.xcassets */,
+				01DC2485232C1A0800F9B56E /* LaunchScreen.storyboard */,
+				01DC2488232C1A0800F9B56E /* Info.plist */,
+				01DC2480232C1A0600F9B56E /* CroupierExample.xcdatamodeld */,
+			);
+			path = CroupierExample;
+			sourceTree = "<group>";
+		};
+		01DC248E232C1B0B00F9B56E /* CoreData */ = {
+			isa = PBXGroup;
+			children = (
+				01DC248F232C1B1F00F9B56E /* CoreDataRepository.swift */,
+			);
+			path = CoreData;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -134,18 +192,40 @@
 			productReference = 01DC244E232C145000F9B56E /* Croupier.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		01DC2476232C1A0600F9B56E /* CroupierExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 01DC248B232C1A0800F9B56E /* Build configuration list for PBXNativeTarget "CroupierExample" */;
+			buildPhases = (
+				01DC2473232C1A0600F9B56E /* Sources */,
+				01DC2474232C1A0600F9B56E /* Frameworks */,
+				01DC2475232C1A0600F9B56E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				01DC248D232C1A3000F9B56E /* PBXTargetDependency */,
+			);
+			name = CroupierExample;
+			productName = CroupierExample;
+			productReference = 01DC2477232C1A0600F9B56E /* CroupierExample.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		01DC2445232C145000F9B56E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 1030;
 				LastUpgradeCheck = 1030;
 				ORGANIZATIONNAME = "Daniel Bennett";
 				TargetAttributes = {
 					01DC244D232C145000F9B56E = {
 						CreatedOnToolsVersion = 10.3;
 						LastSwiftMigration = 1030;
+					};
+					01DC2476232C1A0600F9B56E = {
+						CreatedOnToolsVersion = 10.3;
 					};
 				};
 			};
@@ -155,12 +235,14 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = 01DC2444232C145000F9B56E;
 			productRefGroup = 01DC244F232C145000F9B56E /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				01DC2476232C1A0600F9B56E /* CroupierExample */,
 				01DC244D232C145000F9B56E /* Croupier */,
 			);
 		};
@@ -171,6 +253,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		01DC2475232C1A0600F9B56E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				01DC2487232C1A0800F9B56E /* LaunchScreen.storyboard in Resources */,
+				01DC2484232C1A0800F9B56E /* Assets.xcassets in Resources */,
+				01DC247F232C1A0600F9B56E /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -185,12 +277,50 @@
 				01DC245B232C147C00F9B56E /* Repository.swift in Sources */,
 				01DC2468232C153B00F9B56E /* FetchAndStore.swift in Sources */,
 				01DC2465232C152000F9B56E /* InMemoryStore.swift in Sources */,
+				01DC2490232C1B1F00F9B56E /* CoreDataRepository.swift in Sources */,
 				01DC2460232C14F100F9B56E /* FoundationHTTPClient.swift in Sources */,
 				01DC2462232C150200F9B56E /* HTTPRepository.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		01DC2473232C1A0600F9B56E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				01DC2482232C1A0700F9B56E /* CroupierExample.xcdatamodeld in Sources */,
+				01DC247C232C1A0600F9B56E /* ViewController.swift in Sources */,
+				01DC247A232C1A0600F9B56E /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		01DC248D232C1A3000F9B56E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 01DC244D232C145000F9B56E /* Croupier */;
+			targetProxy = 01DC248C232C1A3000F9B56E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		01DC247D232C1A0600F9B56E /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				01DC247E232C1A0600F9B56E /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		01DC2485232C1A0800F9B56E /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				01DC2486232C1A0800F9B56E /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		01DC2454232C145000F9B56E /* Debug */ = {
@@ -370,6 +500,42 @@
 			};
 			name = Release;
 		};
+		01DC2489232C1A0800F9B56E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 7ZHX5Y8Q3B;
+				INFOPLIST_FILE = CroupierExample/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = uk.co.dollop.CroupierExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		01DC248A232C1A0800F9B56E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 7ZHX5Y8Q3B;
+				INFOPLIST_FILE = CroupierExample/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = uk.co.dollop.CroupierExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -391,7 +557,29 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		01DC248B232C1A0800F9B56E /* Build configuration list for PBXNativeTarget "CroupierExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				01DC2489232C1A0800F9B56E /* Debug */,
+				01DC248A232C1A0800F9B56E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		01DC2480232C1A0600F9B56E /* CroupierExample.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				01DC2481232C1A0700F9B56E /* CroupierExample.xcdatamodel */,
+			);
+			currentVersion = 01DC2481232C1A0700F9B56E /* CroupierExample.xcdatamodel */;
+			path = CroupierExample.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 01DC2445232C145000F9B56E /* Project object */;
 }
