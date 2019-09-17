@@ -31,22 +31,59 @@ class ViewController: UIViewController {
         return container
     }()
 
-    var repo: CoreDataRepository<Games>?
+    var coreDataRepo: CacheFirstRepository<Games>?
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        repo = CoreDataRepository<Games>(context: persistentContainer.viewContext,
-                                         primaryKey: "identifier")
-        let item = Games(context: persistentContainer.viewContext)
-        item.name = "Test game"
-//        repo?.store(item: item, forKey: "232324823498237") { (result) in
+        createRepo()
+    }
+
+    func createRepo() {
+        let url = URL(string: "http://www.mocky.io/v2/")!
+        let session = URLSession.shared
+        let repo = Builder<Games>.buildCoreDataRepo(url: url,
+                                                    urlSession: session,
+                                                    context: persistentContainer.viewContext)
+//        repo.get(forKey: "5d81415b30000010006995c5", options: nil) { (result) in
 //            print(result)
 //        }
-
-        repo?.getAll(completion: { (result) in
+        repo.get(forKey: "5d81415b30000010006995c5", options: nil) { (result) in
             print(result)
-        })
+        }
     }
 }
 
+@objc(Games)
+class Games: NSManagedObject, Codable {
+    @NSManaged var identifier: String
+    @NSManaged var name: String
+
+    private enum CodingKeys: String, CodingKey {
+        case identifier
+        case name
+    }
+
+    required convenience init(from decoder: Decoder) throws {
+        guard let context = decoder.userInfo[.context] as? NSManagedObjectContext,
+            let entity = NSEntityDescription.entity(forEntityName: "Games", in: context) else {
+            fatalError("No context found")
+        }
+        self.init(entity: entity, insertInto: context)
+
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        identifier = try container.decode(String.self, forKey: .identifier)
+        name = try container.decode(String.self, forKey: .name)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(identifier, forKey: .identifier)
+        try container.encode(name, forKey: .name)
+    }
+}
+
+private extension CodingUserInfoKey {
+    static let context = CodingUserInfoKey(rawValue: "context")!
+}

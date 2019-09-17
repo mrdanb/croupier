@@ -1,7 +1,6 @@
 import Foundation
 
-public class FoundationHTTPClient: HTTPClient {
-
+public final class FoundationHTTPClient: Source {
     enum Error: Swift.Error {
         case invalidURL
         case invalidParameters
@@ -14,11 +13,11 @@ public class FoundationHTTPClient: HTTPClient {
         self.session = session
     }
 
-    public func get(url: URL,
+    public func data(for key: URL,
                     parameters: [String: String]? = nil,
                     completion: @escaping (Result<Data, Swift.Error>) -> Void) {
 
-        guard var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+        guard var urlComponents = URLComponents(url: key, resolvingAgainstBaseURL: false) else {
             completion(.failure(Error.invalidURL))
             return
         }
@@ -44,4 +43,3 @@ public class FoundationHTTPClient: HTTPClient {
         task.resume()
     }
 }
-

@@ -3,12 +3,13 @@ import Foundation
 public final class HTTPRepository<ModelType>: Repository where ModelType: Codable {
 
     private let baseUrl: URL
-    private let httpClient: HTTPClient
-    private lazy var jsonDecoder = JSONDecoder()
+    private let httpClient: Source
+    private let decoder: Decoding
 
-    public init(baseUrl: URL, httpClient: HTTPClient) {
+    public init(baseUrl: URL, httpClient: Source, decoder: Decoding) {
         self.baseUrl = baseUrl
         self.httpClient = httpClient
+        self.decoder = decoder
     }
 
     public func get(forKey key: String,
@@ -16,12 +17,12 @@ public final class HTTPRepository<ModelType>: Repository where ModelType: Codabl
                     completion: @escaping (Result<ModelType, Error>) -> Void) {
 
         let fullUrl = baseUrl.appendingPathComponent(key)
-        httpClient.get(url: fullUrl, parameters: options) { (result) in
+        httpClient.data(for: fullUrl, parameters: options) { (result) in
 
             completion(
                 result.flatMap({ (data) -> Result<ModelType, Swift.Error> in
                     do {
-                        let model = try self.jsonDecoder.decode(ModelType.self, from: data)
+                        let model = try self.decoder.decode(ModelType.self, from: data)
                         return .success(model)
                     } catch {
                         return .failure(error)
@@ -48,9 +49,8 @@ public final class HTTPRepository<ModelType>: Repository where ModelType: Codabl
 }
 
 public extension HTTPRepository {
-    convenience init(baseUrl: URL, urlSession: URLSession) {
-
+    convenience init(baseUrl: URL, urlSession: URLSession, decoder: Decoding) {
         let client = FoundationHTTPClient(session: urlSession)
-        self.init(baseUrl: baseUrl, httpClient: client)
+        self.init(baseUrl: baseUrl, httpClient: client, decoder: decoder)
     }
 }
