@@ -1,6 +1,7 @@
 import Foundation
 
-class CacheWithTTL<Store>: Cache where Store: Fetching & Storing {
+public class CacheWithTTL<Store>: Cache where Store: Fetching & Storing {
+    public typealias ModelType = Store.ModelType
     private var lastFetched = [String: TimeInterval]()
     private let store: Store
     private let freshLifetime: TimeInterval
@@ -22,7 +23,7 @@ class CacheWithTTL<Store>: Cache where Store: Fetching & Storing {
     //        store.store(item: entry, forKey: key, completion: nil)
     //    }
 
-    func put<ModelType>(key: String, entry: ModelType) {
+    public func put<ModelType>(key: String, entry: ModelType) {
         guard let item = entry as? Store.ModelType else {
             return
         }
@@ -36,11 +37,11 @@ class CacheWithTTL<Store>: Cache where Store: Fetching & Storing {
         }
     }
 
-    func fresh<ModelType>(key: String) -> ModelType? {
+    public func fresh<ModelType>(key: String) -> ModelType? {
         return nil
     }
 
-    func stale<ModelType>(key: String) -> ModelType? {
+    public func stale<ModelType>(key: String) -> ModelType? {
         return nil
     }
     //    public func fresh(key: String) -> ModelType? {

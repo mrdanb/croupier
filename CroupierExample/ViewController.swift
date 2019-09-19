@@ -31,9 +31,6 @@ class ViewController: UIViewController {
         return container
     }()
 
-    var coreDataRepo: CacheFirstRepository<Games>?
-    
-
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -43,15 +40,26 @@ class ViewController: UIViewController {
     func createRepo() {
         let url = URL(string: "http://www.mocky.io/v2/")!
         let session = URLSession.shared
-        let repo = Builder<Games>.buildCoreDataRepo(url: url,
-                                                    urlSession: session,
-                                                    context: persistentContainer.viewContext)
+//        let repo = Builder.buildCoreDataRepo<Games>(url: url,
+//                                                    urlSession: session,
+//                                                    context: persistentContainer.viewContext)
+//
 //        repo.get(forKey: "5d81415b30000010006995c5", options: nil) { (result) in
 //            print(result)
 //        }
-        repo.get(forKey: "5d81415b30000010006995c5", options: nil) { (result) in
-            print(result)
-        }
+//        repo.get(forKey: "5d81415b30000010006995c5", options: nil) { (result) in
+//            print(result)
+//        }
+//        let builder = Builder(baseUrl: url,
+//                              urlSession: session,
+//                              context: persistentContainer.viewContext,
+//                              primaryKey: "identifier")
+//
+//        let repo =  builder.repositoryWithCache(decoder: builder.coreDataDecoder(),
+//                                                source: builder.foundationHttpSource(),
+//                                                cache: builder.cacheWithTTL(store: builder.coreDataRepository(for: Games.self)))
+
+        
     }
 }
 

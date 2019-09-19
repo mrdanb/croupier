@@ -1,11 +1,29 @@
 import Foundation
 
-public class CacheFirstRepository<ModelType>: Repository where ModelType: Codable {
+struct AnyCache<ModelType>: Cache {
 
+    private let _put: (String, ModelType) -> Void
+    private let _fresh: (String) -> ModelType?
+    private let _stale: (String) -> ModelType?
+
+    init<C: Cache>(_ cache: C) where C.ModelType == ModelType {
+        _put = cache.put
+        _fresh = cache.fresh
+        _stale = cache.stale
+    }
+
+    func put(key: String, entry: ModelType) { _put(key, entry) }
+
+    func fresh(key: String) -> ModelType? { return _fresh(key) }
+
+    func stale(key: String) -> ModelType? { return _stale(key) }
+}
+
+public class CacheFirstRepository<ModelType>: Repository where ModelType: Codable {
     private let baseUrl: URL
     private let decoder: Decoding
     private let source: Source
-    private let cache: Cache
+    private let cache: AnyCache<ModelType>
     private lazy var baseKey: String = {
         guard let components = URLComponents(url: baseUrl, resolvingAgainstBaseURL: false) else {
             fatalError("Unable to create URL components from base URL")
@@ -13,7 +31,7 @@ public class CacheFirstRepository<ModelType>: Repository where ModelType: Codabl
         return components.path
     }()
 
-    init(baseUrl: URL, decoder: Decoding, source: Source, cache: Cache) {
+    init(baseUrl: URL, decoder: Decoding, source: Source, cache: AnyCache<ModelType>) {
         self.baseUrl = baseUrl
         self.decoder = decoder
         self.source = source
@@ -24,13 +42,23 @@ public class CacheFirstRepository<ModelType>: Repository where ModelType: Codabl
                     options: [String : String]?,
                     completion: @escaping (Result<ModelType, Error>) -> Void) {
 
+        if let fresh: ModelType = cache.fresh(key: key) {
+            completion(.success(fresh))
+            return
+        }
+
+        if let stale: ModelType = cache.stale(key: key) {
+            // Pull and update cache...
+            completion(.success(stale))
+            return
+        }
+
         let fullUrl = baseUrl.appendingPathComponent(key)
-        fetchFromCacheOrSource(ModelType.self, key: key, url: fullUrl, completion: completion)
+        fetchAndDecode(ModelType.self, at: fullUrl, completion: completion) //TODO
     }
 
     public func getAll(completion: @escaping (Result<[ModelType], Error>) -> Void) {
 
-        fetchFromCacheOrSource([ModelType].self, key: baseKey, url: baseUrl, completion: completion)
     }
 
     public func delete(forKey key: String,
@@ -47,7 +75,7 @@ public class CacheFirstRepository<ModelType>: Repository where ModelType: Codabl
 
 private extension CacheFirstRepository {
 
-    func fetchFromCacheOrSource<T>(_ type: T.Type,
+   /* func fetchFromCacheOrSource<T>(_ type: T.Type,
                                    key: String,
                                    url: URL,
                                    completion: @escaping (Result<T,Error>) -> Void) where T: Decodable {
@@ -59,30 +87,30 @@ private extension CacheFirstRepository {
         fetchAndDecode(T.self, at: url) { (result) in
             switch result {
             case .success(let item):
-                self.cache.put(key: key, entry: item)
+//                self.cache.put(key: key, entry: item)
                 completion(.success(item))
             case .failure(_):
                 // Use cache on error?
                 print("Failed to load...")
             }
         }
-    }
+    }*/
 
-    func fetchFromCacheAndUpdateIfNeeded<T>(_ type: T.Type, key: String, url: URL) -> T? where T: Decodable {
-        if let fresh: T? = cache.fresh(key: key) {
-            return fresh
-        }
-
-        let stale: T? = cache.stale(key: key)
-        if stale != nil {
-            fetchAndDecode(T.self, at: url) { (result) in
-                if case .success(let item) = result {
-                    self.cache.put(key: key, entry: item)
-                }
-            }
-        }
-        return stale
-    }
+//    func fetchFromCacheAndUpdateIfNeeded<T>(_ type: T.Type, key: String, url: URL) -> T? where T: Decodable {
+//        if let fresh: T? = cache.fresh(key: key) {
+//            return fresh
+//        }
+//
+//        let stale: T? = cache.stale(key: key)
+//        if stale != nil {
+//            fetchAndDecode(T.self, at: url) { (result) in
+//                if case .success(let item) = result {
+//                    self.cache.put(key: key, entry: item)
+//                }
+//            }
+//        }
+//        return stale
+//    }
 
     func fetchAndDecode<T>(_ type: T.Type, at url: URL, completion: @escaping (Result<T, Error>) -> Void) where T: Decodable {
         source.data(for: url, parameters: nil) { (result) in
