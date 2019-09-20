@@ -40,6 +40,7 @@ class ViewController: UIViewController {
     func createRepo() {
         let url = URL(string: "http://www.mocky.io/v2/")!
         let session = URLSession.shared
+        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 //        let repo = Builder.buildCoreDataRepo<Games>(url: url,
 //                                                    urlSession: session,
 //                                                    context: persistentContainer.viewContext)
@@ -58,6 +59,8 @@ class ViewController: UIViewController {
 //        let repo =  builder.repositoryWithCache(decoder: builder.coreDataDecoder(),
 //                                                source: builder.foundationHttpSource(),
 //                                                cache: builder.cacheWithTTL(store: builder.coreDataRepository(for: Games.self)))
+
+        
 
         
     }

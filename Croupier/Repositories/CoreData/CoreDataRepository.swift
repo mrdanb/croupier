@@ -12,7 +12,7 @@ public final class CoreDataRepository<ModelType>: Repository where ModelType: NS
     private let context: NSManagedObjectContext
     private let primaryKey: String
 
-    public init(context: NSManagedObjectContext, primaryKey: String) {
+    public init(for type: ModelType.Type, context: NSManagedObjectContext, primaryKey: String) {
         self.context = context
         self.primaryKey = primaryKey
     }

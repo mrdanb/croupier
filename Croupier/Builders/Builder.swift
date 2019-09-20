@@ -1,53 +1,37 @@
 import Foundation
 import CoreData
 
-public struct Builder {
+class FooBuilder<ModelType> where ModelType: Codable {
 
-    private let baseUrl: URL
-    private let urlSession: URLSession
-    private let context: NSManagedObjectContext
-    private let primaryKey: String
-    private let freshLifetime: TimeInterval = 10
-    private let staleLifetime: TimeInterval = 20
-
-    public init(baseUrl: URL, urlSession: URLSession, context: NSManagedObjectContext, primaryKey: String) {
-        self.baseUrl = baseUrl
-        self.urlSession = urlSession
-        self.context = context
-        self.primaryKey = primaryKey
+    init(for type: ModelType.Type) { }
+    func build<C>(url: URL,
+                  source: Source,
+                  decoder: Decoding,
+                  cache: C) -> CacheFirstRepository<C>? where C: Cache, C.ModelType == ModelType {
+        return CacheFirstRepository(for: ModelType.self, baseUrl: url, decoder: decoder, source: source, cache: cache)
     }
+}
 
-//    public static func coreDataRepo<T: NSManagedObject>(for type: T.Type,
-//                                                        url: URL,
-//                                                        urlSession: URLSession,
-//                                                        context: NSManagedObjectContext) -> CacheFirstRepository<CacheWithTTL<CoreDataRepository<T>>> {
-//        let decoder = CoreDataDecoder(context: context)
-//        let source = FoundationHTTPClient(session: urlSession)
-//        let coreDataStore = CoreDataRepository<T>(context: context, primaryKey: "identifier")
-//        let cache = CacheWithTTL(store: coreDataStore, freshLifetime: 1.0, staleLifetime: 5.0) { Date().timeIntervalSince1970 }
-//        return CacheFirstRepository<CacheWithTTL<CoreDataRepository<T>>>(baseUrl: url,
-//                                                                         decoder: decoder,
-//                                                                         source: source,
-//                                                                         cache: cache)
-//    }
 
-    public func coreDataDecoder() -> CoreDataDecoder {
-        return CoreDataDecoder(context: context)
+class TestFoo: NSManagedObject, Codable {
+    required init(from decoder: Decoder) throws {
+        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        guard let entity = NSEntityDescription.entity(forEntityName: "TestFoo", in: context) else {
+            fatalError("Could not create entity")
+        }
+        super.init(entity: entity, insertInto: nil)
     }
+}
 
-    public func foundationHttpSource() -> FoundationHTTPClient {
-        return FoundationHTTPClient(session: urlSession)
-    }
+func test() {
+    let url = URL(string: "http://www.google.com")!
+    let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+    let session = URLSession.shared
 
-    public func coreDataRepository<T>(for type: T.Type) -> CoreDataRepository<T> {
-        return CoreDataRepository<T>(context: context, primaryKey: primaryKey)
-    }
+    let decoder = CoreDataDecoder(context: context)
+    let source = FoundationHTTPClient(session: session)
+    let store = CoreDataRepository(for: TestFoo.self, context: context, primaryKey: "identifier")
+    let cache = CacheWithTTL(store: store, freshLifetime: 32, staleLifetime: 50) { NSDate().timeIntervalSince1970 }
 
-    public func cacheWithTTL<R: Repository>(store: R) -> CacheWithTTL<R> {
-        return CacheWithTTL(store: store, freshLifetime: freshLifetime, staleLifetime: staleLifetime) { Date().timeIntervalSince1970 }
-    }
-
-    public func repositoryWithCache<C: Cache>(decoder: Decoding, source: Source, cache: C) -> CacheFirstRepository<C> {
-        return CacheFirstRepository(baseUrl: baseUrl, decoder: decoder, source: source, cache: cache)
-    }
+    let repo = FooBuilder(for: TestFoo.self).build(url: url, source: source, decoder: decoder, cache: cache)
 }

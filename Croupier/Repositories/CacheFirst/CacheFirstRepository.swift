@@ -19,11 +19,48 @@ struct AnyCache<ModelType>: Cache {
     func stale(key: String) -> ModelType? { return _stale(key) }
 }
 
-public class CacheFirstRepository<ModelType>: Repository where ModelType: Codable {
+public struct AnyRepo<ModelType>: Repository {
+
+    private let _get: (String, [String: String]?, @escaping (Result<ModelType,Error>) -> Void) -> Void
+    private let _getAll: (@escaping (Result<[ModelType],Error>) -> Void) -> Void
+    private let _store: (ModelType, String, ((Result<ModelType,Error>) -> Void)?) -> Void
+    private let _delete: (String, ((Result<ModelType?,Error>) -> Void)?) -> Void
+    init<R: Repository>(_ repository: R) where R.ModelType == ModelType {
+        _get = repository.get
+        _getAll = repository.getAll
+        _store = repository.store
+        _delete = repository.delete
+    }
+
+    public func get(forKey key: String, options: [String : String]?, completion: @escaping (Result<ModelType, Error>) -> Void) {
+        _get(key, options, completion)
+    }
+
+    public func getAll(completion: @escaping (Result<[ModelType], Error>) -> Void) {
+        _getAll(completion)
+    }
+
+    public func store(item: ModelType, forKey key: String, completion: ((Result<ModelType, Error>) -> Void)?) {
+        _store(item, key, completion)
+    }
+
+    public func delete(forKey key: String, completion: ((Result<ModelType?, Error>) -> Void)?) {
+        _delete(key, completion)
+    }
+}
+
+//public extension AnyRepo {
+//    func cacheWithTTL(freshLifetime: TimeInterval, staleLifetime: TimeInterval) -> CacheWithTTL<ModelType> {
+//        return CacheWithTTL<ModelType>(store: self, freshLifetime: freshLifetime, staleLifetime: staleLifetime) { NSDate().timeIntervalSince1970 }
+//    }
+//}
+
+public class CacheFirstRepository<CacheType>: Repository where CacheType: Cache, CacheType.ModelType: Codable {
+    public typealias ModelType = CacheType.ModelType
     private let baseUrl: URL
     private let decoder: Decoding
     private let source: Source
-    private let cache: AnyCache<ModelType>
+    private let cache: CacheType
     private lazy var baseKey: String = {
         guard let components = URLComponents(url: baseUrl, resolvingAgainstBaseURL: false) else {
             fatalError("Unable to create URL components from base URL")
@@ -31,7 +68,7 @@ public class CacheFirstRepository<ModelType>: Repository where ModelType: Codabl
         return components.path
     }()
 
-    init(baseUrl: URL, decoder: Decoding, source: Source, cache: AnyCache<ModelType>) {
+    init(for type: ModelType.Type, baseUrl: URL, decoder: Decoding, source: Source, cache: CacheType) {
         self.baseUrl = baseUrl
         self.decoder = decoder
         self.source = source

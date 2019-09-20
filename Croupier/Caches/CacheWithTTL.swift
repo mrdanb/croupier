@@ -1,4 +1,5 @@
 import Foundation
+import CoreData
 
 public class CacheWithTTL<Store>: Cache where Store: Fetching & Storing {
     public typealias ModelType = Store.ModelType
@@ -18,22 +19,10 @@ public class CacheWithTTL<Store>: Cache where Store: Fetching & Storing {
         self.currentTime = currentTime
     }
 
-    //    public func put(key: String, entry: ModelType) {
-    //        lastFetched[key] = currentTime()
-    //        store.store(item: entry, forKey: key, completion: nil)
-    //    }
-
-    public func put<ModelType>(key: String, entry: ModelType) {
-        guard let item = entry as? Store.ModelType else {
-            return
-        }
-        store.store(item: item, forKey: key) { (result) in
-            result.flatMap({ (entry) -> Result<ModelType, Error> in
-                guard let item = entry as? ModelType else {
-                    return .failure(RepositoryError.notFound)
-                }
-                return .success(item)
-            })
+    public func put(key: String, entry: ModelType) {
+        lastFetched[key] = currentTime()
+        store.store(item: entry, forKey: key) { (result) in
+            // TODO: Call completion
         }
     }
 
@@ -61,3 +50,4 @@ public class CacheWithTTL<Store>: Cache where Store: Fetching & Storing {
     //        return lastFetchedAt + lifetime
     //    }
 }
+
