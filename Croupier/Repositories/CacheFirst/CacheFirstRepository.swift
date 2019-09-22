@@ -1,60 +1,5 @@
 import Foundation
 
-struct AnyCache<ModelType>: Cache {
-
-    private let _put: (String, ModelType) -> Void
-    private let _fresh: (String) -> ModelType?
-    private let _stale: (String) -> ModelType?
-
-    init<C: Cache>(_ cache: C) where C.ModelType == ModelType {
-        _put = cache.put
-        _fresh = cache.fresh
-        _stale = cache.stale
-    }
-
-    func put(key: String, entry: ModelType) { _put(key, entry) }
-
-    func fresh(key: String) -> ModelType? { return _fresh(key) }
-
-    func stale(key: String) -> ModelType? { return _stale(key) }
-}
-
-public struct AnyRepo<ModelType>: Repository {
-
-    private let _get: (String, [String: String]?, @escaping (Result<ModelType,Error>) -> Void) -> Void
-    private let _getAll: (@escaping (Result<[ModelType],Error>) -> Void) -> Void
-    private let _store: (ModelType, String, ((Result<ModelType,Error>) -> Void)?) -> Void
-    private let _delete: (String, ((Result<ModelType?,Error>) -> Void)?) -> Void
-    init<R: Repository>(_ repository: R) where R.ModelType == ModelType {
-        _get = repository.get
-        _getAll = repository.getAll
-        _store = repository.store
-        _delete = repository.delete
-    }
-
-    public func get(forKey key: String, options: [String : String]?, completion: @escaping (Result<ModelType, Error>) -> Void) {
-        _get(key, options, completion)
-    }
-
-    public func getAll(completion: @escaping (Result<[ModelType], Error>) -> Void) {
-        _getAll(completion)
-    }
-
-    public func store(item: ModelType, forKey key: String, completion: ((Result<ModelType, Error>) -> Void)?) {
-        _store(item, key, completion)
-    }
-
-    public func delete(forKey key: String, completion: ((Result<ModelType?, Error>) -> Void)?) {
-        _delete(key, completion)
-    }
-}
-
-//public extension AnyRepo {
-//    func cacheWithTTL(freshLifetime: TimeInterval, staleLifetime: TimeInterval) -> CacheWithTTL<ModelType> {
-//        return CacheWithTTL<ModelType>(store: self, freshLifetime: freshLifetime, staleLifetime: staleLifetime) { NSDate().timeIntervalSince1970 }
-//    }
-//}
-
 public class CacheFirstRepository<CacheType>: Repository where CacheType: Cache, CacheType.ModelType: Codable {
     public typealias ModelType = CacheType.ModelType
     private let baseUrl: URL
@@ -78,24 +23,27 @@ public class CacheFirstRepository<CacheType>: Repository where CacheType: Cache,
     public func get(forKey key: String,
                     options: [String : String]?,
                     completion: @escaping (Result<ModelType, Error>) -> Void) {
+        let fullUrl = baseUrl.appendingPathComponent(key)
+        fetchFromCache(key: key, url: fullUrl) { (result) in
+            //
+        }
 
-        if let fresh: ModelType = cache.fresh(key: key) {
+        fetchAndDecode(ModelType.self, at: fullUrl, completion: completion) //TODO
+    }
+
+    public func getAll(completion: @escaping (Result<[ModelType], Error>) -> Void) {
+        if let fresh = cache.fresh(key: baseKey) {
             completion(.success(fresh))
             return
         }
 
-        if let stale: ModelType = cache.stale(key: key) {
+        if let stale = cache.stale(key: baseKey) {
             // Pull and update cache...
             completion(.success(stale))
             return
         }
 
-        let fullUrl = baseUrl.appendingPathComponent(key)
-        fetchAndDecode(ModelType.self, at: fullUrl, completion: completion) //TODO
-    }
-
-    public func getAll(completion: @escaping (Result<[ModelType], Error>) -> Void) {
-
+        fetchAndDecode([ModelType].self, at: baseUrl, completion: completion)
     }
 
     public func delete(forKey key: String,
@@ -112,32 +60,54 @@ public class CacheFirstRepository<CacheType>: Repository where CacheType: Cache,
 
 private extension CacheFirstRepository {
 
-   /* func fetchFromCacheOrSource<T>(_ type: T.Type,
-                                   key: String,
-                                   url: URL,
-                                   completion: @escaping (Result<T,Error>) -> Void) where T: Decodable {
-        if let cache = fetchFromCacheAndUpdateIfNeeded(T.self, key: key, url: url) {
+    func fetchFromCache<T>(_ type: T.Type, key: String) where T: Collection, T.Element == ModelType {
+        if let cache = cache.fresh(key: key) {
+
+        }
+    }
+
+    func fetchFromCache<T>(type: T.Type, key: String) where T == ModelType {
+        if let cache = cache.fresh(key: key) {
+            
+        }
+    }
+
+    func fetchFromCache(key: String,
+                        url: URL,
+                        completion: @escaping (Result<[ModelType]?,Error>) -> Void) {
+        if let cache = cache.fresh(key: key) {
             completion(.success(cache))
             return
         }
 
-        fetchAndDecode(T.self, at: url) { (result) in
-            switch result {
-            case .success(let item):
-//                self.cache.put(key: key, entry: item)
-                completion(.success(item))
-            case .failure(_):
-                // Use cache on error?
-                print("Failed to load...")
-            }
+        if let stale = cache.stale(key: key) {
+            // Update cash
+            completion(.success(stale))
+            return
         }
-    }*/
+        completion(.success(nil))
 
-//    func fetchFromCacheAndUpdateIfNeeded<T>(_ type: T.Type, key: String, url: URL) -> T? where T: Decodable {
-//        if let fresh: T? = cache.fresh(key: key) {
+//        if let cache = fetchFromCacheAndUpdateIfNeeded(T.self, key: key, url: url) {
+//            completion(.success(cache))
+//            return
+//        }
+
+//        fetchAndDecode(T.self, at: url) { (result) in
+//            switch result {
+//            case .success(let item):
+////                self.cache.put(key: key, entry: item)
+//                completion(.success(item))
+//            case .failure(_):
+//                // Use cache on error?
+//                print("Failed to load...")
+//            }
+//        }
+    }
+
+    func fetchFromCacheAndUpdateIfNeeded(key: String, url: URL) -> [ModelType]? {
+//        if let fresh = cache.fresh(key: key) {
 //            return fresh
 //        }
-//
 //        let stale: T? = cache.stale(key: key)
 //        if stale != nil {
 //            fetchAndDecode(T.self, at: url) { (result) in
@@ -147,7 +117,8 @@ private extension CacheFirstRepository {
 //            }
 //        }
 //        return stale
-//    }
+        return nil
+    }
 
     func fetchAndDecode<T>(_ type: T.Type, at url: URL, completion: @escaping (Result<T, Error>) -> Void) where T: Decodable {
         source.data(for: url, parameters: nil) { (result) in
@@ -163,4 +134,5 @@ private extension CacheFirstRepository {
             )
         }
     }
+
 }

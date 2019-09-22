@@ -19,18 +19,15 @@ public class CacheWithTTL<Store>: Cache where Store: Fetching & Storing {
         self.currentTime = currentTime
     }
 
-    public func put(key: String, entry: ModelType) {
+    public func put(key: String, entry: [ModelType]) {
         lastFetched[key] = currentTime()
-        store.store(item: entry, forKey: key) { (result) in
-            // TODO: Call completion
-        }
     }
 
-    public func fresh<ModelType>(key: String) -> ModelType? {
+    public func fresh<ModelType>(key: String) -> [ModelType]? {
         return nil
     }
 
-    public func stale<ModelType>(key: String) -> ModelType? {
+    public func stale<ModelType>(key: String) -> [ModelType]? {
         return nil
     }
     //    public func fresh(key: String) -> ModelType? {

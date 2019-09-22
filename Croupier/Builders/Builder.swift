@@ -1,13 +1,36 @@
 import Foundation
 import CoreData
 
-class FooBuilder<ModelType> where ModelType: Codable {
+class Builder<ModelType> where ModelType: Codable {
 
     init(for type: ModelType.Type) { }
+
+    private var decoder: Decoding?
+    private var source: Source?
+    private var store: Source?
+
+    @discardableResult
+    public func withCoreDataDecoder(context: NSManagedObjectContext) -> Builder {
+        decoder = CoreDataDecoder(context: context)
+        return self
+    }
+
+    @discardableResult
+    public func foundationHTTPClient(urlSession: URLSession) -> Builder {
+        source = FoundationHTTPClient(session: urlSession)
+        return self
+    }
+
+    @discardableResult
+    public func coreDataRepository(urlSession: URLSession) -> Builder {
+        source = FoundationHTTPClient(session: urlSession)
+        return self
+    }
+
     func build<C>(url: URL,
                   source: Source,
                   decoder: Decoding,
-                  cache: C) -> CacheFirstRepository<C>? where C: Cache, C.ModelType == ModelType {
+                  cache: C) -> CacheFirstRepository<C> where C: Cache, C.ModelType == ModelType {
         return CacheFirstRepository(for: ModelType.self, baseUrl: url, decoder: decoder, source: source, cache: cache)
     }
 }
@@ -33,5 +56,8 @@ func test() {
     let store = CoreDataRepository(for: TestFoo.self, context: context, primaryKey: "identifier")
     let cache = CacheWithTTL(store: store, freshLifetime: 32, staleLifetime: 50) { NSDate().timeIntervalSince1970 }
 
-    let repo = FooBuilder(for: TestFoo.self).build(url: url, source: source, decoder: decoder, cache: cache)
+    let repo = Builder(for: TestFoo.self).build(url: url,
+                                                source: source,
+                                                decoder: decoder,
+                                                cache: cache)
 }
