@@ -46,7 +46,7 @@ class ViewController: UIViewController {
     }
 
     func createRepo() {
-        let url = URL(string: "http://www.mocky.io/v2/")!
+        let url = URL(string: "http://www.mocky.io/v2/5d8950953000006100b9a0f4")!
         let session = URLSession.shared
         let context = persistentContainer.viewContext
         context.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
@@ -61,7 +61,7 @@ class ViewController: UIViewController {
                                        cache: store)
         self.repo = AnyRepository(repo)
 
-        self.repo?.get(forKey: "5d8948843000002700b9a0be") { (result) in
+        self.repo?.getAll() { (result) in
             switch result {
             case .success(let item):
                 print(item)

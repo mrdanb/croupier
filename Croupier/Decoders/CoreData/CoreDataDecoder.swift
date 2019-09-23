@@ -11,6 +11,8 @@ public class CoreDataDecoder: Decoding {
 
     public func decode<T>(_ type: T.Type, from data: Data) throws -> T where T: Decodable {
         let jsonDecoder = JSONDecoder()
+        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        context.parent = self.context
         jsonDecoder.userInfo[.managedObjectContext] = context
         return try jsonDecoder.decode(type, from: data)
     }

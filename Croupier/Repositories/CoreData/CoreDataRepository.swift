@@ -97,12 +97,14 @@ public final class CoreDataRepository<ModelType>: Repository where ModelType: NS
                 childContext.insert(item)
             })
             do {
+                print(items)
                 try childContext.saveIfNeeded()
-                guard let results: [ModelType] = try self.context.executeFetch(predicate: NSPredicate(format: "self IN %@", objectIDs)) else {
-                    throw RepositoryError.CoreData.failedToFindObjectAfterSave
-                }
-                completion(.success(results))
+//                guard let results: [ModelType] = try self.context.executeFetch(predicate: NSPredicate(format: "self IN %@", objectIDs)) else {
+//                    throw RepositoryError.CoreData.failedToFindObjectAfterSave
+//                }
+                completion(.success(items))
             } catch {
+                print(error)
                 completion(.failure(error))
             }
         }
