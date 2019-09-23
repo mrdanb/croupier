@@ -9,7 +9,6 @@ public final class InMemoryRepository<ModelType>: Repository  {
     }
 
     public func get(forKey key: String,
-                    options: [String : String]?,
                     completion: @escaping (Result<ModelType, Error>) -> Void) {
         if let item = map[key] {
             completion(.success(item))

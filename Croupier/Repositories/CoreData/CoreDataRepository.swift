@@ -18,7 +18,6 @@ public final class CoreDataRepository<ModelType>: Repository where ModelType: NS
     }
 
     public func get(forKey key: String,
-                    options: [String : String]? = nil,
                     completion: @escaping (Result<ModelType, Error>) -> Void) {
         context.perform { [weak self] in
             guard let strongSelf = self else { return }

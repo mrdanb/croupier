@@ -2,6 +2,12 @@ import UIKit
 import CoreData
 import Croupier
 
+// TODO:
+/*
+ • Updating rather than 'putting' objects in a cache
+ • Pull and decoding an array of JSON objects (how do you get to the root key)?
+*/
+
 class ViewController: UIViewController {
 
     lazy var persistentContainer: NSPersistentContainer = {

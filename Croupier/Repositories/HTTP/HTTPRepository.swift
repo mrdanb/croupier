@@ -13,11 +13,10 @@ public final class HTTPRepository<ModelType>: Repository where ModelType: Codabl
     }
 
     public func get(forKey key: String,
-                    options: [String: String]? = nil,
                     completion: @escaping (Result<ModelType, Error>) -> Void) {
 
         let fullUrl = baseUrl.appendingPathComponent(key)
-        httpClient.data(for: fullUrl, parameters: options) { (result) in
+        httpClient.data(for: fullUrl, parameters: nil) { (result) in
 
             completion(
                 result.flatMap({ (data) -> Result<ModelType, Swift.Error> in

@@ -29,7 +29,7 @@
 		01DC24A323317E4300F9B56E /* RepositoryError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC24A223317E4300F9B56E /* RepositoryError.swift */; };
 		01DC24A523317E8100F9B56E /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC24A423317E8100F9B56E /* Cache.swift */; };
 		01DC24A723317EC800F9B56E /* CacheWithTTL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC24A623317EC800F9B56E /* CacheWithTTL.swift */; };
-		01DC24B22331803200F9B56E /* CacheFirstRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC24B12331803200F9B56E /* CacheFirstRepository.swift */; };
+		01DC24B22331803200F9B56E /* RepositoryWithCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC24B12331803200F9B56E /* RepositoryWithCache.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,7 +69,7 @@
 		01DC24A223317E4300F9B56E /* RepositoryError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoryError.swift; sourceTree = "<group>"; };
 		01DC24A423317E8100F9B56E /* Cache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cache.swift; sourceTree = "<group>"; };
 		01DC24A623317EC800F9B56E /* CacheWithTTL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheWithTTL.swift; sourceTree = "<group>"; };
-		01DC24B12331803200F9B56E /* CacheFirstRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheFirstRepository.swift; sourceTree = "<group>"; };
+		01DC24B12331803200F9B56E /* RepositoryWithCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoryWithCache.swift; sourceTree = "<group>"; };
 		01DC24B32331869800F9B56E /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -248,7 +248,7 @@
 		01DC24B02331802000F9B56E /* CacheFirst */ = {
 			isa = PBXGroup;
 			children = (
-				01DC24B12331803200F9B56E /* CacheFirstRepository.swift */,
+				01DC24B12331803200F9B56E /* RepositoryWithCache.swift */,
 			);
 			path = CacheFirst;
 			sourceTree = "<group>";
@@ -368,7 +368,7 @@
 			files = (
 				01DC249C23317E0300F9B56E /* Fetching.swift in Sources */,
 				01DC249E23317E1900F9B56E /* Storing.swift in Sources */,
-				01DC24B22331803200F9B56E /* CacheFirstRepository.swift in Sources */,
+				01DC24B22331803200F9B56E /* RepositoryWithCache.swift in Sources */,
 				01DC245B232C147C00F9B56E /* Repository.swift in Sources */,
 				01DC2465232C152000F9B56E /* InMemoryRepository.swift in Sources */,
 				01DC249A2330304400F9B56E /* Source.swift in Sources */,

@@ -1,6 +1,6 @@
 import Foundation
 
-public class CacheFirstRepository<CacheType>: Repository where CacheType: Cache, CacheType.ModelType: Codable {
+public class RepositoryWithCache<CacheType>: Repository where CacheType: Cache, CacheType.ModelType: Codable {
     public typealias ModelType = CacheType.ModelType
     private let baseUrl: URL
     private let decoder: Decoding
@@ -21,27 +21,45 @@ public class CacheFirstRepository<CacheType>: Repository where CacheType: Cache,
     }
 
     public func get(forKey key: String,
-                    options: [String : String]?,
                     completion: @escaping (Result<ModelType, Error>) -> Void) {
         let fullUrl = baseUrl.appendingPathComponent(key)
-        fetchFromCache(key: key, url: fullUrl) { (result) in
-            //
-        }
-
-        fetchAndDecode(ModelType.self, at: fullUrl, completion: completion) //TODO
-    }
-
-    public func getAll(completion: @escaping (Result<[ModelType], Error>) -> Void) {
-        if let fresh = cache.fresh(key: baseKey) {
+        if let fresh = cache.fresh(forKey: key) {
             completion(.success(fresh))
             return
         }
-
-        if let stale = cache.stale(key: baseKey) {
-            // Pull and update cache...
+        if let stale = cache.stale(forKey: key) {
             completion(.success(stale))
-            return
+            fetchAndDecode(ModelType.self, at: fullUrl) { (result) in
+                if case .success(let item) = result {
+                    try? self.cache.store(entry: item, forKey:key)
+                }
+            }
         }
+        fetchAndDecode(ModelType.self, at: fullUrl) { (result) in
+            completion(
+                result.flatMapError({ (_) -> Result<ModelType, Error> in
+                    do {
+                        let item = try self.cache.any(forKey: key)
+                        return .success(item)
+                    } catch {
+                        return .failure(error)
+                    }
+                })
+            )
+        }
+    }
+
+    public func getAll(completion: @escaping (Result<[ModelType], Error>) -> Void) {
+//        if let fresh = cache.fresh(key: baseKey) {
+//            completion(.success(fresh))
+//            return
+//        }
+//
+//        if let stale = cache.stale(key: baseKey) {
+//            // Pull and update cache...
+//            completion(.success(stale))
+//            return
+//        }
 
         fetchAndDecode([ModelType].self, at: baseUrl, completion: completion)
     }
@@ -58,51 +76,7 @@ public class CacheFirstRepository<CacheType>: Repository where CacheType: Cache,
     }
 }
 
-private extension CacheFirstRepository {
-
-    func fetchFromCache<T>(_ type: T.Type, key: String) where T: Collection, T.Element == ModelType {
-        if let cache = cache.fresh(key: key) {
-
-        }
-    }
-
-    func fetchFromCache<T>(type: T.Type, key: String) where T == ModelType {
-        if let cache = cache.fresh(key: key) {
-            
-        }
-    }
-
-    func fetchFromCache(key: String,
-                        url: URL,
-                        completion: @escaping (Result<[ModelType]?,Error>) -> Void) {
-        if let cache = cache.fresh(key: key) {
-            completion(.success(cache))
-            return
-        }
-
-        if let stale = cache.stale(key: key) {
-            // Update cash
-            completion(.success(stale))
-            return
-        }
-        completion(.success(nil))
-
-//        if let cache = fetchFromCacheAndUpdateIfNeeded(T.self, key: key, url: url) {
-//            completion(.success(cache))
-//            return
-//        }
-
-//        fetchAndDecode(T.self, at: url) { (result) in
-//            switch result {
-//            case .success(let item):
-////                self.cache.put(key: key, entry: item)
-//                completion(.success(item))
-//            case .failure(_):
-//                // Use cache on error?
-//                print("Failed to load...")
-//            }
-//        }
-    }
+private extension RepositoryWithCache {
 
     func fetchFromCacheAndUpdateIfNeeded(key: String, url: URL) -> [ModelType]? {
 //        if let fresh = cache.fresh(key: key) {
