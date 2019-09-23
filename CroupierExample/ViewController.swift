@@ -73,7 +73,7 @@ class Games: NSManagedObject, Codable {
     }
 
     required convenience init(from decoder: Decoder) throws {
-        guard let context = decoder.userInfo[.context] as? NSManagedObjectContext,
+        guard let context = decoder.managedObjectContext,
             let entity = NSEntityDescription.entity(forEntityName: "Games", in: context) else {
             fatalError("No context found")
         }
@@ -89,8 +89,4 @@ class Games: NSManagedObject, Codable {
         try container.encode(identifier, forKey: .identifier)
         try container.encode(name, forKey: .name)
     }
-}
-
-private extension CodingUserInfoKey {
-    static let context = CodingUserInfoKey(rawValue: "context")!
 }
