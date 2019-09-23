@@ -189,7 +189,7 @@
 		01DC24A923317F0E00F9B56E /* Repositories */ = {
 			isa = PBXGroup;
 			children = (
-				01DC24B02331802000F9B56E /* CacheFirst */,
+				01DC24B02331802000F9B56E /* WithCache */,
 				01DC24AF23317FB800F9B56E /* HTTP */,
 				01DC24AC23317F4200F9B56E /* InMemory */,
 				01DC24AA23317F1900F9B56E /* CoreData */,
@@ -245,12 +245,12 @@
 			path = HTTP;
 			sourceTree = "<group>";
 		};
-		01DC24B02331802000F9B56E /* CacheFirst */ = {
+		01DC24B02331802000F9B56E /* WithCache */ = {
 			isa = PBXGroup;
 			children = (
 				01DC24B12331803200F9B56E /* RepositoryWithCache.swift */,
 			);
-			path = CacheFirst;
+			path = WithCache;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

@@ -7,9 +7,3 @@ public protocol Fetching {
 
     func getAll(completion: @escaping (Result<[ModelType], Error>) -> Void)
 }
-
-public protocol SynchronousFetching {
-    associatedtype ModelType
-    func get(forKey key: String) throws -> ModelType
-    func getAll() throws -> [ModelType]
-}

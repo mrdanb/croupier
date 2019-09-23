@@ -1,7 +1,7 @@
 import Foundation
 import CoreData
 
-public class CacheWithTTL<Store>: Cache where Store: SynchronousFetching & SynchronousStoring {
+/*public class CacheWithTTL<Store>: Cache where Store: SynchronousFetching & SynchronousStoring {
     public typealias ModelType = Store.ModelType
     private var lastFetched = [String: TimeInterval]()
     private let store: Store
@@ -21,7 +21,7 @@ public class CacheWithTTL<Store>: Cache where Store: SynchronousFetching & Synch
 
     public func store(entry: ModelType, forKey key: String) throws {
         lastFetched[key] = currentTime()
-        try store.store(item: entry, forKey: key)
+        _ = try store.store(item: entry, forKey: key)
     }
 
     public func fresh(forKey key: String) -> ModelType? {
@@ -47,3 +47,4 @@ public class CacheWithTTL<Store>: Cache where Store: SynchronousFetching & Synch
     }
 }
 
+*/

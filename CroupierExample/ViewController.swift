@@ -44,27 +44,23 @@ class ViewController: UIViewController {
     }
 
     func createRepo() {
-        let url = URL(string: "http://www.mocky.io/v2/")!
+        let url = URL(string: "http://www.mocky.io/")!
         let session = URLSession.shared
-        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-//        let repo = Builder.buildCoreDataRepo<Games>(url: url,
-//                                                    urlSession: session,
-//                                                    context: persistentContainer.viewContext)
-//
-//        repo.get(forKey: "5d81415b30000010006995c5", options: nil) { (result) in
-//            print(result)
-//        }
-//        repo.get(forKey: "5d81415b30000010006995c5", options: nil) { (result) in
-//            print(result)
-//        }
-//        let builder = Builder(baseUrl: url,
-//                              urlSession: session,
-//                              context: persistentContainer.viewContext,
-//                              primaryKey: "identifier")
-//
-//        let repo =  builder.repositoryWithCache(decoder: builder.coreDataDecoder(),
-//                                                source: builder.foundationHttpSource(),
-//                                                cache: builder.cacheWithTTL(store: builder.coreDataRepository(for: Games.self)))
+        let context = persistentContainer.viewContext
+
+        let decoding = CoreDataDecoder(context: context)
+        let source = FoundationHTTPClient(session: session)
+        let store = CoreDataRepository(for: Games.self, context: context, primaryKey: "identifier")
+        let repo = RepositoryWithCache(for: Games.self,
+                                       baseUrl: url,
+                                       decoder: decoding,
+                                       source: source,
+                                       cache: store)
+
+        repo.get(forKey: "5d8948843000002700b9a0be") { (result) in
+            print(result)
+        }
+
     }
 }
 

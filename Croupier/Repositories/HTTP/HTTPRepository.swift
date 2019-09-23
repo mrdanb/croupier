@@ -35,14 +35,13 @@ public final class HTTPRepository<ModelType>: Repository where ModelType: Codabl
         fatalError("Unimplemented")
     }
 
-    public func delete(forKey key: String,
-                       completion: ((Result<ModelType?, Error>) -> Void)?) {
+    public func delete(item: ModelType,
+                       completion: @escaping (Result<ModelType, Error>) -> Void) {
         fatalError("Unimplemented")
     }
 
     public func store(item: ModelType,
-                      forKey key: String,
-                      completion: ((Result<ModelType, Error>) -> Void)?) {
+                      completion: @escaping (Result<ModelType, Error>) -> Void) {
         fatalError("Unimplemented")
     }
 }

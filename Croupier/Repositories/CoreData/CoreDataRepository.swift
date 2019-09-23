@@ -4,6 +4,7 @@ import CoreData
 public extension RepositoryError {
     enum CoreData: Error {
         case objectNotFoundInContext
+        case failedToFindObjectAfterSave
     }
 }
 
@@ -47,39 +48,62 @@ public final class CoreDataRepository<ModelType>: Repository where ModelType: NS
         }
     }
 
-    public func delete(forKey key: String,
-                       completion: ((Result<ModelType?, Error>) -> Void)?) {
-        context.perform { [weak self] in
-            guard let strongSelf = self else { return }
-            strongSelf.get(forKey: key, completion: { (result) in
-
-                let result =
-                result.flatMap({ (item) -> Result<ModelType?, Error> in
-                    do {
-                        strongSelf.context.delete(item)
-                        try strongSelf.context.saveIfNeeded()
-                        return .success(item)
-                    } catch {
-                        return .failure(error)
-                    }
-                })
-                completion?(result)
-            })
+    public func delete(item: ModelType,
+                       completion: @escaping (Result<ModelType, Error>) -> Void) {
+        context.perform { [weak context] in
+            context?.delete(item)
+            do {
+                try context?.saveIfNeeded()
+                completion(.success(item))
+            } catch {
+                completion(.failure(error))
+            }
+//            strongSelf.get(forKey: item.primaryKey, completion: { (result) in
+//                completion?(
+//                    result.map({ (item) -> Persisting in
+//                        strongSelf.context.delete(item)
+//                        return strongSelf
+//                    })
+//                )
+//            })
         }
     }
 
     public func store(item: ModelType,
-                      forKey key: String,
-                      completion: ((Result<ModelType, Error>) -> Void)?) {
-        context.perform { [weak self] in
-            guard let strongSelf = self else { return }
-            item.setValue(key, forKey: strongSelf.primaryKey)
-            strongSelf.context.insert(item)
+                      completion: @escaping (Result<ModelType, Error>) -> Void) {
+        context.perform { [weak context] in
+            guard let context = context else { return }
+            let objectID = item.objectID
+            context.insert(item)
             do {
-                try strongSelf.context.saveIfNeeded()
-                completion?(.success(item))
+                try context.saveIfNeeded()
+                guard let result = context.object(with: objectID) as? ModelType else {
+                    throw RepositoryError.CoreData.failedToFindObjectAfterSave
+                }
+                completion(.success(result))
             } catch {
-                completion?(.failure(error))
+                completion(.failure(error))
+            }
+        }
+    }
+
+    // Note: XCode 11 == NSBatchInsertRequest
+    public func store(items: [ModelType],
+                      completion: @escaping (Result<[ModelType], Error>) -> Void) {
+        context.performTaskInChildContext { (childContext) in
+            var objectIDs = [NSManagedObjectID]()
+            items.forEach({ (item) in
+                objectIDs.append(item.objectID)
+                childContext.insert(item)
+            })
+            do {
+                try childContext.saveIfNeeded()
+                guard let results: [ModelType] = try self.context.executeFetch(predicate: NSPredicate(format: "self IN %@", objectIDs)) else {
+                    throw RepositoryError.CoreData.failedToFindObjectAfterSave
+                }
+                completion(.success(results))
+            } catch {
+                completion(.failure(error))
             }
         }
     }
@@ -91,6 +115,14 @@ private extension NSManagedObjectContext {
         let request = T.fetchRequest()
         request.predicate = predicate
         return try fetch(request) as? [T]
+    }
+
+    func performTaskInChildContext(task: @escaping (NSManagedObjectContext) -> Void) {
+        let backgroundContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        backgroundContext.parent = self
+        backgroundContext.perform {
+            task(backgroundContext)
+        }
     }
 
     func saveIfNeeded() throws {

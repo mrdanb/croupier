@@ -44,15 +44,3 @@ class TestFoo: NSManagedObject, Codable {
     }
 }
 */
-
-
-func test() {
-    let url = URL(string: "http://www.google.com")!
-    let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-    let session = URLSession.shared
-
-    let decoder = CoreDataDecoder(context: context)
-    let source = FoundationHTTPClient(session: session)
-    let store = CoreDataRepository(for: TestFoo.self, context: context, primaryKey: "identifier")
-    let cache = CacheWithTTL(store: store, freshLifetime: 32, staleLifetime: 50) { NSDate().timeIntervalSince1970 }
-}
