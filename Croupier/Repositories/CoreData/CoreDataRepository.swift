@@ -24,7 +24,7 @@ public final class CoreDataRepository<ModelType>: Repository where ModelType: NS
             guard let strongSelf = self else { return }
             do {
 
-                let predicate = NSPredicate(format: "%k = %@", strongSelf.primaryKey, key)
+                let predicate = NSPredicate(format: "%K = %@", strongSelf.primaryKey, key)
                 guard let result: ModelType = try strongSelf.context.executeFetch(predicate: predicate)?.first else {
                     throw RepositoryError.CoreData.objectNotFoundInContext
                 }

@@ -37,6 +37,8 @@ class ViewController: UIViewController {
         return container
     }()
 
+    var repo: AnyRepository<Games>?
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -44,9 +46,10 @@ class ViewController: UIViewController {
     }
 
     func createRepo() {
-        let url = URL(string: "http://www.mocky.io/")!
+        let url = URL(string: "http://www.mocky.io/v2/")!
         let session = URLSession.shared
         let context = persistentContainer.viewContext
+        context.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
 
         let decoding = CoreDataDecoder(context: context)
         let source = FoundationHTTPClient(session: session)
@@ -56,9 +59,15 @@ class ViewController: UIViewController {
                                        decoder: decoding,
                                        source: source,
                                        cache: store)
+        self.repo = AnyRepository(repo)
 
-        repo.get(forKey: "5d8948843000002700b9a0be") { (result) in
-            print(result)
+        self.repo?.get(forKey: "5d8948843000002700b9a0be") { (result) in
+            switch result {
+            case .success(let item):
+                print(item)
+            case .failure(let error):
+                print(error)
+            }
         }
 
     }
