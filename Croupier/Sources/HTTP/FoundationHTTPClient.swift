@@ -8,16 +8,19 @@ public final class FoundationHTTPClient: Source {
     }
 
     private let session: URLSession
+    private let baseURL: URL
 
-    public init(session: URLSession) {
+    public init(session: URLSession, baseURL: URL) {
         self.session = session
+        self.baseURL = baseURL
     }
 
-    public func data(for key: URL,
+    public func data(for key: String,
                     parameters: [String: String]? = nil,
                     completion: @escaping (Result<Data, Swift.Error>) -> Void) {
 
-        guard var urlComponents = URLComponents(url: key, resolvingAgainstBaseURL: false) else {
+        let fullURL = baseURL.appendingPathComponent(key)
+        guard var urlComponents = URLComponents(url: fullURL, resolvingAgainstBaseURL: false) else {
             completion(.failure(Error.invalidURL))
             return
         }
