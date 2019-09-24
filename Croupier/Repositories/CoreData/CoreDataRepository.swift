@@ -72,7 +72,7 @@ public final class CoreDataRepository<ModelType>: Repository where ModelType: NS
         }
     }
 
-    // Note: XCode 11 == NSBatchInsertRequest
+    // TODO: XCode 11 == NSBatchInsertRequest
     public func store(items: [ModelType],
                       completion: @escaping (Result<[ModelType], Error>) -> Void) {
         guard items.isEmpty == false else { return }
@@ -87,9 +87,6 @@ public final class CoreDataRepository<ModelType>: Repository where ModelType: NS
         } catch {
             completion(.failure(error))
         }
-        // Check if the items are in the correct context....
-        // Move them over if not....
-        // Save the context
     }
 }
 
