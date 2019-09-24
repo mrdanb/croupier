@@ -2,20 +2,12 @@ import Foundation
 
 public class RepositoryWithCache<Store>: Repository where Store: Fetching & Storing, Store.ModelType: Codable {
     public typealias ModelType = Store.ModelType
-    private let baseUrl: URL
     private let decoder: Decoding
     private let source: Source
     private let cache: Store
-    private lazy var baseKey: String = {
-        guard let components = URLComponents(url: baseUrl, resolvingAgainstBaseURL: false) else {
-            fatalError("Unable to create URL components from base URL")
-        }
-        return components.path
-    }()
     private lazy var decodeQueue = DispatchQueue(label: "uk.co.dollop.concierge.decodequeue")
 
-    public init(for type: ModelType.Type, baseUrl: URL, decoder: Decoding, source: Source, cache: Store) {
-        self.baseUrl = baseUrl
+    public init(for type: ModelType.Type, decoder: Decoding, source: Source, cache: Store) {
         self.decoder = decoder
         self.source = source
         self.cache = cache
@@ -23,9 +15,8 @@ public class RepositoryWithCache<Store>: Repository where Store: Fetching & Stor
 
     public func get(forKey key: String,
                     completion: @escaping (Result<ModelType, Error>) -> Void) {
-        let fullUrl = baseUrl.appendingPathComponent(key)
 
-        fetchAndDecode(ModelType.self, at: fullUrl) { (result) in
+        fetchAndDecode(ModelType.self, forKey: key) { (result) in
             switch result {
             case .success(let item):
                 self.cache.store(item: item, completion: completion)
@@ -37,7 +28,7 @@ public class RepositoryWithCache<Store>: Repository where Store: Fetching & Stor
 
     public func getAll(completion: @escaping (Result<[ModelType], Error>) -> Void) {
 
-        fetchAndDecode([ModelType].self, at: baseUrl) { (result) in
+        fetchAndDecode([ModelType].self, forKey: "") { (result) in
             switch result {
             case .success(let items):
                 self.cache.store(items: items, completion: completion)
@@ -60,8 +51,8 @@ public class RepositoryWithCache<Store>: Repository where Store: Fetching & Stor
 
 private extension RepositoryWithCache {
 
-    func fetchAndDecode<T>(_ type: T.Type, at url: URL, completion: @escaping (Result<T, Error>) -> Void) where T: Decodable {
-        source.data(for: url, parameters: nil) { (result) in
+    func fetchAndDecode<T>(_ type: T.Type, forKey key: String, completion: @escaping (Result<T, Error>) -> Void) where T: Decodable {
+        source.data(for: key, parameters: nil) { (result) in
 
             self.decodeQueue.async {
                 let result = result.flatMap({ (data) -> Result<T, Error> in

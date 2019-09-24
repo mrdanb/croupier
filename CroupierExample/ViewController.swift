@@ -31,10 +31,9 @@ class ViewController: UIViewController {
         CoreData.setup(context: context)
 
         let decoding = CoreData.builder.decoder()
-        let source = FoundationHTTPClient(session: session)
+        let source = FoundationHTTPClient(session: session, baseURL: url)
         let store = CoreData.builder.repository(for: Games.self, primaryKey: "identifier")
         let repo = RepositoryWithCache(for: Games.self,
-                                       baseUrl: url,
                                        decoder: decoding,
                                        source: source,
                                        cache: store)

@@ -2,12 +2,10 @@ import Foundation
 
 public final class HTTPRepository<ModelType>: Repository where ModelType: Codable {
 
-    private let baseUrl: URL
     private let httpClient: Source
     private let decoder: Decoding
 
-    public init(baseUrl: URL, httpClient: Source, decoder: Decoding) {
-        self.baseUrl = baseUrl
+    public init(httpClient: Source, decoder: Decoding) {
         self.httpClient = httpClient
         self.decoder = decoder
     }
@@ -15,8 +13,7 @@ public final class HTTPRepository<ModelType>: Repository where ModelType: Codabl
     public func get(forKey key: String,
                     completion: @escaping (Result<ModelType, Error>) -> Void) {
 
-        let fullUrl = baseUrl.appendingPathComponent(key)
-        httpClient.data(for: fullUrl, parameters: nil) { (result) in
+        httpClient.data(for: key, parameters: nil) { (result) in
 
             completion(
                 result.flatMap({ (data) -> Result<ModelType, Swift.Error> in
@@ -48,7 +45,7 @@ public final class HTTPRepository<ModelType>: Repository where ModelType: Codabl
 
 public extension HTTPRepository {
     convenience init(baseUrl: URL, urlSession: URLSession, decoder: Decoding) {
-        let client = FoundationHTTPClient(session: urlSession)
-        self.init(baseUrl: baseUrl, httpClient: client, decoder: decoder)
+        let client = FoundationHTTPClient(session: urlSession, baseURL: baseUrl)
+        self.init(httpClient: client, decoder: decoder)
     }
 }
