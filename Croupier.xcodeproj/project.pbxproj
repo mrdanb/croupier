@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		016030C72339828A00C37C96 /* AnyRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 016030C62339828A00C37C96 /* AnyRepository.swift */; };
+		01BCB1DA233ACB7600714F1D /* JSONDecodableDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01BCB1D9233ACB7600714F1D /* JSONDecodableDecoder.swift */; };
 		01DC2453232C145000F9B56E /* Croupier.h in Headers */ = {isa = PBXBuildFile; fileRef = 01DC2451232C145000F9B56E /* Croupier.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		01DC245B232C147C00F9B56E /* Repository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC245A232C147C00F9B56E /* Repository.swift */; };
 		01DC2460232C14F100F9B56E /* FoundationHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC245F232C14F100F9B56E /* FoundationHTTPClient.swift */; };
@@ -44,6 +45,7 @@
 
 /* Begin PBXFileReference section */
 		016030C62339828A00C37C96 /* AnyRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyRepository.swift; sourceTree = "<group>"; };
+		01BCB1D9233ACB7600714F1D /* JSONDecodableDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONDecodableDecoder.swift; sourceTree = "<group>"; };
 		01DC244E232C145000F9B56E /* Croupier.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Croupier.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		01DC2451232C145000F9B56E /* Croupier.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Croupier.h; sourceTree = "<group>"; };
 		01DC2452232C145000F9B56E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -97,6 +99,14 @@
 				016030C62339828A00C37C96 /* AnyRepository.swift */,
 			);
 			path = Erasure;
+			sourceTree = "<group>";
+		};
+		01BCB1D8233ACB6900714F1D /* Decodable */ = {
+			isa = PBXGroup;
+			children = (
+				01BCB1D9233ACB7600714F1D /* JSONDecodableDecoder.swift */,
+			);
+			path = Decodable;
 			sourceTree = "<group>";
 		};
 		01DC2444232C145000F9B56E = {
@@ -173,6 +183,7 @@
 		01DC248E232C1B0B00F9B56E /* Decoders */ = {
 			isa = PBXGroup;
 			children = (
+				01BCB1D8233ACB6900714F1D /* Decodable */,
 				01DC24AB23317F2500F9B56E /* CoreData */,
 			);
 			path = Decoders;
@@ -388,6 +399,7 @@
 				01DC2496233028AE00F9B56E /* CoreDataDecoder.swift in Sources */,
 				01DC24942330289700F9B56E /* Decoding.swift in Sources */,
 				01DC249823302A0E00F9B56E /* CoreData.swift in Sources */,
+				01BCB1DA233ACB7600714F1D /* JSONDecodableDecoder.swift in Sources */,
 				01DC2462232C150200F9B56E /* HTTPRepository.swift in Sources */,
 				01DC24A323317E4300F9B56E /* RepositoryError.swift in Sources */,
 			);
