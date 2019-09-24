@@ -4,8 +4,9 @@ import Croupier
 
 // TODO:
 /*
- • Updating rather than 'putting' objects in a cache
+ • Updating rather than 'putting' objects in a cache (/)
  • Pull and decoding an array of JSON objects (how do you get to the root key)?
+ • Deleting objects that don't come down the API?
 */
 
 class ViewController: UIViewController {
@@ -46,7 +47,7 @@ class ViewController: UIViewController {
     }
 
     func createRepo() {
-        let url = URL(string: "http://www.mocky.io/v2/5d8950953000006100b9a0f4")!
+        let url = URL(string: "http://www.mocky.io/v2/5d8a71053000005300b9a96c")!
         let session = URLSession.shared
         let context = persistentContainer.viewContext
         context.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
@@ -61,14 +62,14 @@ class ViewController: UIViewController {
                                        cache: store)
         self.repo = AnyRepository(repo)
 
-        self.repo?.getAll() { (result) in
+        self.repo?.getAll(completion: { (result) in
             switch result {
-            case .success(let item):
-                print(item)
+            case .success(let items):
+                print(items)
             case .failure(let error):
                 print(error)
             }
-        }
+        })
 
     }
 }
