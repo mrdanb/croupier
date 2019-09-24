@@ -40,7 +40,6 @@ public class RepositoryWithCache<Store>: Repository where Store: Fetching & Stor
         fetchAndDecode([ModelType].self, at: baseUrl) { (result) in
             switch result {
             case .success(let items):
-                print(items)
                 self.cache.store(items: items, completion: completion)
             case.failure:
                 self.cache.getAll(completion: completion)

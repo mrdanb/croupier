@@ -23,7 +23,6 @@ public final class CoreDataRepository<ModelType>: Repository where ModelType: NS
         context.perform { [weak self] in
             guard let strongSelf = self else { return }
             do {
-
                 let predicate = NSPredicate(format: "%K = %@", strongSelf.primaryKey, key)
                 guard let result: ModelType = try strongSelf.context.executeFetch(predicate: predicate)?.first else {
                     throw RepositoryError.CoreData.objectNotFoundInContext
@@ -90,7 +89,17 @@ public final class CoreDataRepository<ModelType>: Repository where ModelType: NS
     // Note: XCode 11 == NSBatchInsertRequest
     public func store(items: [ModelType],
                       completion: @escaping (Result<[ModelType], Error>) -> Void) {
-        context.performTaskInChildContext { (childContext) in
+        let objectIDs = items.map({ $0.objectID })
+        do {
+            let results: [ModelType]? = try context.executeFetch(predicate: NSPredicate(format: "self IN %@", objectIDs))
+            print(results)
+        } catch {
+            print(error)
+        }
+        // Check if the items are in the correct context....
+        // Move them over if not....
+        // Save the context
+        /*context.performTaskInChildContext { (childContext) in
             var objectIDs = [NSManagedObjectID]()
             items.forEach({ (item) in
                 objectIDs.append(item.objectID)
@@ -107,7 +116,7 @@ public final class CoreDataRepository<ModelType>: Repository where ModelType: NS
                 print(error)
                 completion(.failure(error))
             }
-        }
+        }*/
     }
 }
 
@@ -125,10 +134,5 @@ private extension NSManagedObjectContext {
         backgroundContext.perform {
             task(backgroundContext)
         }
-    }
-
-    func saveIfNeeded() throws {
-        guard hasChanges else { return }
-        try save()
     }
 }
