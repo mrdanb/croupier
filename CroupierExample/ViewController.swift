@@ -52,9 +52,11 @@ class ViewController: UIViewController {
         let context = persistentContainer.viewContext
         context.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
 
-        let decoding = CoreDataDecoder(context: context)
+        CoreData.setup(context: context)
+
+        let decoding = CoreData.builder.decoder()
         let source = FoundationHTTPClient(session: session)
-        let store = CoreDataRepository(for: Games.self, context: context, primaryKey: "identifier")
+        let store = CoreData.builder.repository(for: Games.self, primaryKey: "identifier")
         let repo = RepositoryWithCache(for: Games.self,
                                        baseUrl: url,
                                        decoder: decoding,

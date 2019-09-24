@@ -5,7 +5,7 @@ public class CoreDataDecoder: Decoding {
 
     private let context: NSManagedObjectContext
 
-    public init(context: NSManagedObjectContext) {
+    init(context: NSManagedObjectContext) {
         self.context = context
     }
 
