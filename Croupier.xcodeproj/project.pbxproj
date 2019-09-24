@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		016030C72339828A00C37C96 /* AnyRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 016030C62339828A00C37C96 /* AnyRepository.swift */; };
 		01DC2453232C145000F9B56E /* Croupier.h in Headers */ = {isa = PBXBuildFile; fileRef = 01DC2451232C145000F9B56E /* Croupier.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		01DC245B232C147C00F9B56E /* Repository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC245A232C147C00F9B56E /* Repository.swift */; };
 		01DC2460232C14F100F9B56E /* FoundationHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC245F232C14F100F9B56E /* FoundationHTTPClient.swift */; };
@@ -21,15 +22,14 @@
 		01DC2490232C1B1F00F9B56E /* CoreDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC248F232C1B1F00F9B56E /* CoreDataRepository.swift */; };
 		01DC24942330289700F9B56E /* Decoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC24932330289600F9B56E /* Decoding.swift */; };
 		01DC2496233028AE00F9B56E /* CoreDataDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC2495233028AE00F9B56E /* CoreDataDecoder.swift */; };
-		01DC249823302A0E00F9B56E /* Builder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC249723302A0E00F9B56E /* Builder.swift */; };
+		01DC249823302A0E00F9B56E /* CoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC249723302A0E00F9B56E /* CoreData.swift */; };
 		01DC249A2330304400F9B56E /* Source.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC24992330304400F9B56E /* Source.swift */; };
 		01DC249C23317E0300F9B56E /* Fetching.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC249B23317E0300F9B56E /* Fetching.swift */; };
 		01DC249E23317E1900F9B56E /* Storing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC249D23317E1900F9B56E /* Storing.swift */; };
 		01DC24A023317E2600F9B56E /* Deleting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC249F23317E2600F9B56E /* Deleting.swift */; };
 		01DC24A323317E4300F9B56E /* RepositoryError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC24A223317E4300F9B56E /* RepositoryError.swift */; };
-		01DC24A523317E8100F9B56E /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC24A423317E8100F9B56E /* Cache.swift */; };
-		01DC24A723317EC800F9B56E /* CacheWithTTL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC24A623317EC800F9B56E /* CacheWithTTL.swift */; };
-		01DC24B22331803200F9B56E /* CacheFirstRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC24B12331803200F9B56E /* CacheFirstRepository.swift */; };
+		01DC24B22331803200F9B56E /* RepositoryWithCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC24B12331803200F9B56E /* RepositoryWithCache.swift */; };
+		8EDA580D233A74320055B5F1 /* NSManagedObjectContext+Saving.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDA580C233A74320055B5F1 /* NSManagedObjectContext+Saving.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,6 +43,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		016030C62339828A00C37C96 /* AnyRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyRepository.swift; sourceTree = "<group>"; };
 		01DC244E232C145000F9B56E /* Croupier.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Croupier.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		01DC2451232C145000F9B56E /* Croupier.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Croupier.h; sourceTree = "<group>"; };
 		01DC2452232C145000F9B56E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -61,16 +62,15 @@
 		01DC248F232C1B1F00F9B56E /* CoreDataRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataRepository.swift; sourceTree = "<group>"; };
 		01DC24932330289600F9B56E /* Decoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Decoding.swift; sourceTree = "<group>"; };
 		01DC2495233028AE00F9B56E /* CoreDataDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataDecoder.swift; sourceTree = "<group>"; };
-		01DC249723302A0E00F9B56E /* Builder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builder.swift; sourceTree = "<group>"; };
+		01DC249723302A0E00F9B56E /* CoreData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreData.swift; sourceTree = "<group>"; };
 		01DC24992330304400F9B56E /* Source.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Source.swift; sourceTree = "<group>"; };
 		01DC249B23317E0300F9B56E /* Fetching.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fetching.swift; sourceTree = "<group>"; };
 		01DC249D23317E1900F9B56E /* Storing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storing.swift; sourceTree = "<group>"; };
 		01DC249F23317E2600F9B56E /* Deleting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Deleting.swift; sourceTree = "<group>"; };
 		01DC24A223317E4300F9B56E /* RepositoryError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoryError.swift; sourceTree = "<group>"; };
-		01DC24A423317E8100F9B56E /* Cache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cache.swift; sourceTree = "<group>"; };
-		01DC24A623317EC800F9B56E /* CacheWithTTL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheWithTTL.swift; sourceTree = "<group>"; };
-		01DC24B12331803200F9B56E /* CacheFirstRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheFirstRepository.swift; sourceTree = "<group>"; };
+		01DC24B12331803200F9B56E /* RepositoryWithCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoryWithCache.swift; sourceTree = "<group>"; };
 		01DC24B32331869800F9B56E /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		8EDA580C233A74320055B5F1 /* NSManagedObjectContext+Saving.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSManagedObjectContext+Saving.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,6 +91,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		016030C52339827400C37C96 /* Erasure */ = {
+			isa = PBXGroup;
+			children = (
+				016030C62339828A00C37C96 /* AnyRepository.swift */,
+			);
+			path = Erasure;
+			sourceTree = "<group>";
+		};
 		01DC2444232C145000F9B56E = {
 			isa = PBXGroup;
 			children = (
@@ -113,10 +121,11 @@
 		01DC2450232C145000F9B56E /* Croupier */ = {
 			isa = PBXGroup;
 			children = (
+				8EDA580B233A741D0055B5F1 /* Extensions */,
+				016030C52339827400C37C96 /* Erasure */,
 				01DC24A123317E3700F9B56E /* Errors */,
 				01DC24AD23317F9500F9B56E /* Sources */,
 				01DC24A923317F0E00F9B56E /* Repositories */,
-				01DC24A823317EDA00F9B56E /* Caches */,
 				01DC248E232C1B0B00F9B56E /* Decoders */,
 				01DC2466232C153200F9B56E /* Builders */,
 				01DC2459232C147000F9B56E /* Core */,
@@ -134,7 +143,6 @@
 				01DC249D23317E1900F9B56E /* Storing.swift */,
 				01DC249F23317E2600F9B56E /* Deleting.swift */,
 				01DC24932330289600F9B56E /* Decoding.swift */,
-				01DC24A423317E8100F9B56E /* Cache.swift */,
 				01DC24992330304400F9B56E /* Source.swift */,
 			);
 			path = Core;
@@ -143,7 +151,7 @@
 		01DC2466232C153200F9B56E /* Builders */ = {
 			isa = PBXGroup;
 			children = (
-				01DC249723302A0E00F9B56E /* Builder.swift */,
+				01DC249723302A0E00F9B56E /* CoreData.swift */,
 			);
 			path = Builders;
 			sourceTree = "<group>";
@@ -178,18 +186,10 @@
 			path = Errors;
 			sourceTree = "<group>";
 		};
-		01DC24A823317EDA00F9B56E /* Caches */ = {
-			isa = PBXGroup;
-			children = (
-				01DC24A623317EC800F9B56E /* CacheWithTTL.swift */,
-			);
-			path = Caches;
-			sourceTree = "<group>";
-		};
 		01DC24A923317F0E00F9B56E /* Repositories */ = {
 			isa = PBXGroup;
 			children = (
-				01DC24B02331802000F9B56E /* CacheFirst */,
+				01DC24B02331802000F9B56E /* WithCache */,
 				01DC24AF23317FB800F9B56E /* HTTP */,
 				01DC24AC23317F4200F9B56E /* InMemory */,
 				01DC24AA23317F1900F9B56E /* CoreData */,
@@ -245,12 +245,20 @@
 			path = HTTP;
 			sourceTree = "<group>";
 		};
-		01DC24B02331802000F9B56E /* CacheFirst */ = {
+		01DC24B02331802000F9B56E /* WithCache */ = {
 			isa = PBXGroup;
 			children = (
-				01DC24B12331803200F9B56E /* CacheFirstRepository.swift */,
+				01DC24B12331803200F9B56E /* RepositoryWithCache.swift */,
 			);
-			path = CacheFirst;
+			path = WithCache;
+			sourceTree = "<group>";
+		};
+		8EDA580B233A741D0055B5F1 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				8EDA580C233A74320055B5F1 /* NSManagedObjectContext+Saving.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -368,18 +376,18 @@
 			files = (
 				01DC249C23317E0300F9B56E /* Fetching.swift in Sources */,
 				01DC249E23317E1900F9B56E /* Storing.swift in Sources */,
-				01DC24B22331803200F9B56E /* CacheFirstRepository.swift in Sources */,
+				01DC24B22331803200F9B56E /* RepositoryWithCache.swift in Sources */,
 				01DC245B232C147C00F9B56E /* Repository.swift in Sources */,
 				01DC2465232C152000F9B56E /* InMemoryRepository.swift in Sources */,
 				01DC249A2330304400F9B56E /* Source.swift in Sources */,
 				01DC2490232C1B1F00F9B56E /* CoreDataRepository.swift in Sources */,
 				01DC2460232C14F100F9B56E /* FoundationHTTPClient.swift in Sources */,
 				01DC24A023317E2600F9B56E /* Deleting.swift in Sources */,
-				01DC24A723317EC800F9B56E /* CacheWithTTL.swift in Sources */,
-				01DC24A523317E8100F9B56E /* Cache.swift in Sources */,
+				8EDA580D233A74320055B5F1 /* NSManagedObjectContext+Saving.swift in Sources */,
+				016030C72339828A00C37C96 /* AnyRepository.swift in Sources */,
 				01DC2496233028AE00F9B56E /* CoreDataDecoder.swift in Sources */,
 				01DC24942330289700F9B56E /* Decoding.swift in Sources */,
-				01DC249823302A0E00F9B56E /* Builder.swift in Sources */,
+				01DC249823302A0E00F9B56E /* CoreData.swift in Sources */,
 				01DC2462232C150200F9B56E /* HTTPRepository.swift in Sources */,
 				01DC24A323317E4300F9B56E /* RepositoryError.swift in Sources */,
 			);

@@ -2,6 +2,6 @@ import Foundation
 
 public protocol Deleting {
     associatedtype ModelType
-    func delete(forKey key: String,
-                completion: ((Result<ModelType?, Error>) -> Void)?)
+    func delete(item: ModelType,
+                completion: @escaping (Result<ModelType, Error>) -> Void)
 }

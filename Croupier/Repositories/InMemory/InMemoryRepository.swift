@@ -1,6 +1,6 @@
 import Foundation
 
-public final class InMemoryRepository<ModelType>: Repository  {
+public final class InMemoryRepository<ModelType>: Repository where ModelType: Item {
 
     private var map: [String: ModelType]
 
@@ -9,7 +9,6 @@ public final class InMemoryRepository<ModelType>: Repository  {
     }
 
     public func get(forKey key: String,
-                    options: [String : String]?,
                     completion: @escaping (Result<ModelType, Error>) -> Void) {
         if let item = map[key] {
             completion(.success(item))
@@ -23,17 +22,19 @@ public final class InMemoryRepository<ModelType>: Repository  {
         completion(.success(all))
     }
 
-    public func delete(forKey key: String,
-                       completion: ((Result<ModelType?, Error>) -> Void)?) {
-        let result = map.removeValue(forKey: key)
-        completion?(.success(result))
+    public func delete(item: ModelType,
+                       completion: @escaping (Result<ModelType, Error>) -> Void) {
+        map.removeValue(forKey: item.primaryKey)
+        completion(.success(item))
     }
 
     public func store(item: ModelType,
-                      forKey key: String,
-                      completion: ((Result<ModelType, Error>) -> Void)?) {
-        map[key] = item
-        completion?(.success(item))
+                      completion: @escaping (Result<ModelType, Error>) -> Void) {
+        map[item.primaryKey] = item
+        completion(.success(item))
     }
 }
 
+public protocol Item {
+    var primaryKey: String { get }
+}

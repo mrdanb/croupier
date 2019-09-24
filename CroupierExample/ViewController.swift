@@ -5,34 +5,16 @@ import Croupier
 class ViewController: UIViewController {
 
     lazy var persistentContainer: NSPersistentContainer = {
-        /*
-         The persistent container for the application. This implementation
-         creates and returns a container, having loaded the store for the
-         application to it. This property is optional since there are legitimate
-         error conditions that could cause the creation of the store to fail.
-         */
         let container = NSPersistentContainer(name: "CroupierExample")
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-
-                /*
-                 Typical reasons for an error here include:
-                 * The parent directory does not exist, cannot be created, or disallows writing.
-                 * The persistent store is not accessible, due to permissions or data protection when the device is locked.
-                 * The device is out of space.
-                 * The store could not be migrated to the current model version.
-                 Check the error message to determine what the actual problem was.
-                 */
                 fatalError("Unresolved error \(error), \(error.userInfo)")
             }
         })
         return container
     }()
 
-    var coreDataRepo: CacheFirstRepository<Games>?
-    
+    var repo: AnyRepository<Games>?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,17 +23,32 @@ class ViewController: UIViewController {
     }
 
     func createRepo() {
-        let url = URL(string: "http://www.mocky.io/v2/")!
+        let url = URL(string: "http://www.mocky.io/v2/5d8a71053000005300b9a96c")!
         let session = URLSession.shared
-        let repo = Builder<Games>.buildCoreDataRepo(url: url,
-                                                    urlSession: session,
-                                                    context: persistentContainer.viewContext)
-//        repo.get(forKey: "5d81415b30000010006995c5", options: nil) { (result) in
-//            print(result)
-//        }
-        repo.get(forKey: "5d81415b30000010006995c5", options: nil) { (result) in
-            print(result)
-        }
+        let context = persistentContainer.viewContext
+        context.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
+
+        CoreData.setup(context: context)
+
+        let decoding = CoreData.builder.decoder()
+        let source = FoundationHTTPClient(session: session)
+        let store = CoreData.builder.repository(for: Games.self, primaryKey: "identifier")
+        let repo = RepositoryWithCache(for: Games.self,
+                                       baseUrl: url,
+                                       decoder: decoding,
+                                       source: source,
+                                       cache: store)
+        self.repo = AnyRepository(repo)
+
+        self.repo?.getAll(completion: { (result) in
+            switch result {
+            case .success(let items):
+                print(items)
+            case .failure(let error):
+                print(error)
+            }
+        })
+
     }
 }
 
@@ -66,7 +63,7 @@ class Games: NSManagedObject, Codable {
     }
 
     required convenience init(from decoder: Decoder) throws {
-        guard let context = decoder.userInfo[.context] as? NSManagedObjectContext,
+        guard let context = decoder.managedObjectContext,
             let entity = NSEntityDescription.entity(forEntityName: "Games", in: context) else {
             fatalError("No context found")
         }
@@ -82,8 +79,4 @@ class Games: NSManagedObject, Codable {
         try container.encode(identifier, forKey: .identifier)
         try container.encode(name, forKey: .name)
     }
-}
-
-private extension CodingUserInfoKey {
-    static let context = CodingUserInfoKey(rawValue: "context")!
 }
