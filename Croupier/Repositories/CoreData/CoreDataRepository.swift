@@ -57,66 +57,39 @@ public final class CoreDataRepository<ModelType>: Repository where ModelType: NS
             } catch {
                 completion(.failure(error))
             }
-//            strongSelf.get(forKey: item.primaryKey, completion: { (result) in
-//                completion?(
-//                    result.map({ (item) -> Persisting in
-//                        strongSelf.context.delete(item)
-//                        return strongSelf
-//                    })
-//                )
-//            })
         }
     }
 
     public func store(item: ModelType,
                       completion: @escaping (Result<ModelType, Error>) -> Void) {
-        context.perform { [weak context] in
-            guard let context = context else { return }
-            let objectID = item.objectID
-            context.insert(item)
-            do {
-                try context.saveIfNeeded()
-                guard let result = context.object(with: objectID) as? ModelType else {
-                    throw RepositoryError.CoreData.failedToFindObjectAfterSave
-                }
-                completion(.success(result))
-            } catch {
-                completion(.failure(error))
+        do {
+            guard let item: ModelType = try context.executeFetch(predicate: NSPredicate(format: "self = %@", item.objectID))?.first else {
+                throw RepositoryError.CoreData.failedToFindObjectAfterSave
             }
+            completion(.success(item))
+        } catch {
+            completion(.failure(error))
         }
     }
 
     // Note: XCode 11 == NSBatchInsertRequest
     public func store(items: [ModelType],
                       completion: @escaping (Result<[ModelType], Error>) -> Void) {
+        guard items.isEmpty == false else { return }
         let objectIDs = items.map({ $0.objectID })
         do {
-            let results: [ModelType]? = try context.executeFetch(predicate: NSPredicate(format: "self IN %@", objectIDs))
-            print(results)
+            guard let results: [ModelType] = try context.executeFetch(predicate: NSPredicate(format: "self IN %@", objectIDs)),
+                results.isEmpty == false else {
+                throw RepositoryError.CoreData.failedToFindObjectAfterSave
+            }
+            try context.saveIfNeeded()
+            completion(.success(results))
         } catch {
-            print(error)
+            completion(.failure(error))
         }
         // Check if the items are in the correct context....
         // Move them over if not....
         // Save the context
-        /*context.performTaskInChildContext { (childContext) in
-            var objectIDs = [NSManagedObjectID]()
-            items.forEach({ (item) in
-                objectIDs.append(item.objectID)
-                childContext.insert(item)
-            })
-            do {
-                print(items)
-                try childContext.saveIfNeeded()
-//                guard let results: [ModelType] = try self.context.executeFetch(predicate: NSPredicate(format: "self IN %@", objectIDs)) else {
-//                    throw RepositoryError.CoreData.failedToFindObjectAfterSave
-//                }
-                completion(.success(items))
-            } catch {
-                print(error)
-                completion(.failure(error))
-            }
-        }*/
     }
 }
 
