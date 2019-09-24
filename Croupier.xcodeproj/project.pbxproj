@@ -31,6 +31,7 @@
 		01DC24A523317E8100F9B56E /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC24A423317E8100F9B56E /* Cache.swift */; };
 		01DC24A723317EC800F9B56E /* CacheWithTTL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC24A623317EC800F9B56E /* CacheWithTTL.swift */; };
 		01DC24B22331803200F9B56E /* RepositoryWithCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC24B12331803200F9B56E /* RepositoryWithCache.swift */; };
+		8EDA580D233A74320055B5F1 /* NSManagedObjectContext+Saving.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EDA580C233A74320055B5F1 /* NSManagedObjectContext+Saving.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,6 +74,7 @@
 		01DC24A623317EC800F9B56E /* CacheWithTTL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheWithTTL.swift; sourceTree = "<group>"; };
 		01DC24B12331803200F9B56E /* RepositoryWithCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoryWithCache.swift; sourceTree = "<group>"; };
 		01DC24B32331869800F9B56E /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		8EDA580C233A74320055B5F1 /* NSManagedObjectContext+Saving.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSManagedObjectContext+Saving.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -123,6 +125,7 @@
 		01DC2450232C145000F9B56E /* Croupier */ = {
 			isa = PBXGroup;
 			children = (
+				8EDA580B233A741D0055B5F1 /* Extensions */,
 				016030C52339827400C37C96 /* Erasure */,
 				01DC24A123317E3700F9B56E /* Errors */,
 				01DC24AD23317F9500F9B56E /* Sources */,
@@ -264,6 +267,14 @@
 			path = WithCache;
 			sourceTree = "<group>";
 		};
+		8EDA580B233A741D0055B5F1 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				8EDA580C233A74320055B5F1 /* NSManagedObjectContext+Saving.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -386,6 +397,7 @@
 				01DC2490232C1B1F00F9B56E /* CoreDataRepository.swift in Sources */,
 				01DC2460232C14F100F9B56E /* FoundationHTTPClient.swift in Sources */,
 				01DC24A023317E2600F9B56E /* Deleting.swift in Sources */,
+				8EDA580D233A74320055B5F1 /* NSManagedObjectContext+Saving.swift in Sources */,
 				016030C72339828A00C37C96 /* AnyRepository.swift in Sources */,
 				01DC24A723317EC800F9B56E /* CacheWithTTL.swift in Sources */,
 				01DC24A523317E8100F9B56E /* Cache.swift in Sources */,
