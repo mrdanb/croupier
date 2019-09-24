@@ -12,6 +12,7 @@ public class RepositoryWithCache<Store>: Repository where Store: Fetching & Stor
         }
         return components.path
     }()
+    private lazy var decodeQueue = DispatchQueue(label: "uk.co.dollop.concierge.decodequeue")
 
     public init(for type: ModelType.Type, baseUrl: URL, decoder: Decoding, source: Source, cache: Store) {
         self.baseUrl = baseUrl
@@ -39,6 +40,7 @@ public class RepositoryWithCache<Store>: Repository where Store: Fetching & Stor
         fetchAndDecode([ModelType].self, at: baseUrl) { (result) in
             switch result {
             case .success(let items):
+                print(items)
                 self.cache.store(items: items, completion: completion)
             case.failure:
                 self.cache.getAll(completion: completion)
@@ -61,8 +63,9 @@ private extension RepositoryWithCache {
 
     func fetchAndDecode<T>(_ type: T.Type, at url: URL, completion: @escaping (Result<T, Error>) -> Void) where T: Decodable {
         source.data(for: url, parameters: nil) { (result) in
-            completion(
-                result.flatMap({ (data) -> Result<T, Error> in
+
+            self.decodeQueue.async {
+                let result = result.flatMap({ (data) -> Result<T, Error> in
                     do {
                         let item = try self.decoder.decode(T.self, from: data)
                         return .success(item)
@@ -70,7 +73,10 @@ private extension RepositoryWithCache {
                         return .failure(error)
                     }
                 })
-            )
+                DispatchQueue.main.async {
+                    completion(result)
+                }
+            }
         }
     }
 
