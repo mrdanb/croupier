@@ -1,6 +1,6 @@
 import Foundation
 
-public final class HTTPRepository<ModelType>: Repository where ModelType: Codable {
+/*public final class HTTPRepository<ModelType>: Repository where ModelType: Codable {
 
     private let httpClient: Source
     private let decoder: Decoding
@@ -49,3 +49,4 @@ public extension HTTPRepository {
         self.init(httpClient: client, decoder: decoder)
     }
 }
+*/

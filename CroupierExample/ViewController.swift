@@ -14,15 +14,46 @@ class ViewController: UIViewController {
         return container
     }()
 
-    var repo: AnyRepository<Games>?
+//    var repo: AnyRepository<Games>?
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        let context = persistentContainer.viewContext
+        let url = URL(string: "http://www.mocky.io/v2/")!
+        let source = FoundationHTTPClient(baseURL: url)
+        let repo = CoreDataRepository(for: Game.self,
+                                      source: source,
+                                      context: context,
+                                      identifier: "identifier")
 
-        createRepo()
+//        repo.sync(key: "5d8beb5d350000f745d472a1",
+//                  responseType: GamesResponse.self,
+//                  serialise: { (response, context) -> [Game] in
+//                    return response.games.compactMap({ (gameResponse) -> Game? in
+//                        guard let game =  NSEntityDescription.insertNewObject(forEntityName: "Game", into: context) as? Game else { return nil }
+//                        game.update(gameResponse)
+//                        return game
+//                    })
+//
+//        }, completion:{ result in
+//            //
+//        })
+
+//        repo.getAll() { (result) in
+//            switch result {
+//            case .success(let items):
+//                print(items)
+//            case .failure(let error):
+//                print(error)
+//            }
+//        }
+
+        repo.get(forKey: "123") { (result) in
+            print(result)
+        }
     }
 
-    func createRepo() {
+    /*func createRepo() {
         let url = URL(string: "http://www.mocky.io/v2/5d8a71053000005300b9a96c")!
         let session = URLSession.shared
         let context = persistentContainer.viewContext
@@ -47,35 +78,48 @@ class ViewController: UIViewController {
                 print(error)
             }
         })
-
-    }
+    }*/
 }
 
-@objc(Games)
-class Games: NSManagedObject, Codable {
+struct GamesResponse: Decodable {
+    let games: [GameResponse]
+}
+
+struct GameResponse: Decodable {
+    let identifier: String
+    let name: String
+}
+
+@objc(Game)
+class Game: NSManagedObject {
     @NSManaged var identifier: String
     @NSManaged var name: String
 
-    private enum CodingKeys: String, CodingKey {
-        case identifier
-        case name
+    func update(_ game: GameResponse) {
+        self.identifier = game.identifier
+        self.name = game.name
     }
 
-    required convenience init(from decoder: Decoder) throws {
-        guard let context = decoder.managedObjectContext,
-            let entity = NSEntityDescription.entity(forEntityName: "Games", in: context) else {
-            fatalError("No context found")
-        }
-        self.init(entity: entity, insertInto: context)
-
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        identifier = try container.decode(String.self, forKey: .identifier)
-        name = try container.decode(String.self, forKey: .name)
-    }
-
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(identifier, forKey: .identifier)
-        try container.encode(name, forKey: .name)
-    }
+//    private enum CodingKeys: String, CodingKey {
+//        case identifier
+//        case name
+//    }
+//
+//    required convenience init(from decoder: Decoder) throws {
+//        guard let context = decoder.managedObjectContext,
+//            let entity = NSEntityDescription.entity(forEntityName: "Games", in: context) else {
+//            fatalError("No context found")
+//        }
+//        self.init(entity: entity, insertInto: context)
+//
+//        let container = try decoder.container(keyedBy: CodingKeys.self)
+//        identifier = try container.decode(String.self, forKey: .identifier)
+//        name = try container.decode(String.self, forKey: .name)
+//    }
+//
+//    func encode(to encoder: Encoder) throws {
+//        var container = encoder.container(keyedBy: CodingKeys.self)
+//        try container.encode(identifier, forKey: .identifier)
+//        try container.encode(name, forKey: .name)
+//    }
 }

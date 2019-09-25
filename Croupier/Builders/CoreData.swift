@@ -1,7 +1,7 @@
 import Foundation
 import CoreData
 
-public class CoreData {
+/*public class CoreData {
 
     private static var _builder: CoreData?
 
@@ -29,3 +29,4 @@ public class CoreData {
         return CoreDataRepository(for: ModelType.self, context: context, primaryKey: primaryKey)
     }
 }
+*/

@@ -1,6 +1,6 @@
 import Foundation
 
-public class RepositoryWithCache<Store>: Repository where Store: Fetching & Storing, Store.ModelType: Codable {
+/*public class RepositoryWithCache<Store>: Repository where Store: Fetching & Deleting {
     public typealias ModelType = Store.ModelType
     private let decoder: Decoding
     private let source: Source
@@ -43,6 +43,10 @@ public class RepositoryWithCache<Store>: Repository where Store: Fetching & Stor
         // perform DELETE to API
     }
 
+    public func sync(completion: @escaping (Result<Bool, Error>) -> Void) {
+
+    }
+
     public func store(item: ModelType,
                       completion: @escaping (Result<ModelType, Error>) -> Void) {
         // perform PUT to API
@@ -70,3 +74,4 @@ private extension RepositoryWithCache {
         }
     }
 }
+*/

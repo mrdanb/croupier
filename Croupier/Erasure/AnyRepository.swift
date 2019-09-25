@@ -1,15 +1,15 @@
 import Foundation
 
-public struct AnyRepository<ModelType>: Repository {
+/*public struct AnyRepository<ModelType>: Repository {
 
     private let _get: (String, @escaping (Result<ModelType,Error>) -> Void) -> Void
     private let _getAll: (@escaping (Result<[ModelType],Error>) -> Void) -> Void
-    private let _store: (ModelType, @escaping (Result<ModelType,Error>) -> Void) -> Void
+    private let _sync: (@escaping (Result<Bool,Error>) -> Void) -> Void
     private let _delete: (ModelType, @escaping (Result<ModelType,Error>) -> Void) -> Void
     public init<Repo>(_ repository: Repo) where Repo: Repository, Repo.ModelType == ModelType {
         _get = repository.get
         _getAll = repository.getAll
-        _store = repository.store
+        _sync = repository.sync
         _delete = repository.delete
     }
 
@@ -21,11 +21,12 @@ public struct AnyRepository<ModelType>: Repository {
         _getAll(completion)
     }
 
-    public func store(item: ModelType, completion: @escaping (Result<ModelType, Error>) -> Void) {
-        _store(item, completion)
+    public func sync(completion: @escaping (Result<Bool, Error>) -> Void) {
+        _sync(completion)
     }
 
     public func delete(item: ModelType, completion: @escaping (Result<ModelType, Error>) -> Void) {
         _delete(item, completion)
     }
 }
+*/

@@ -10,9 +10,9 @@ public final class FoundationHTTPClient: Source {
     private let session: URLSession
     private let baseURL: URL
 
-    public init(session: URLSession, baseURL: URL) {
-        self.session = session
+    public init(baseURL: URL, session: URLSession = URLSession.shared) {
         self.baseURL = baseURL
+        self.session = session
     }
 
     public func data(for key: String,

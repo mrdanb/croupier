@@ -1,6 +1,6 @@
 import Foundation
 
-public final class InMemoryRepository<ModelType>: Repository where ModelType: Item {
+/*public final class InMemoryRepository<ModelType>: Repository where ModelType: Item {
 
     private var map: [String: ModelType]
 
@@ -38,3 +38,4 @@ public final class InMemoryRepository<ModelType>: Repository where ModelType: It
 public protocol Item {
     var primaryKey: String { get }
 }
+*/
