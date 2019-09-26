@@ -128,6 +128,11 @@ public class CoreDataRepository<Response,Entity>: NSObject, NSFetchedResultsCont
 }
 
 extension NSManagedObjectContext {
+    func saveIfNeeded() throws {
+        guard hasChanges else { return }
+        try save()
+    }
+
     func createBackgroundContext() -> NSManagedObjectContext {
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         context.parent = self
