@@ -19,12 +19,18 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         let context = persistentContainer.viewContext
+        context.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
         let url = URL(string: "http://www.mocky.io/v2/")!
         let source = FoundationHTTPClient(baseURL: url)
 
         let repo = CoreDataRepository<GamesResponse, Game>(source: source, context: context, identifier: "identifier")
         repo.sync(key: "5d8beb5d350000f745d472a1") { (result) in
-            print(result)
+            switch result {
+            case .success(let changes):
+                print(changes)
+            case .failure(let error):
+                print(error)
+            }
         }
 
 //        repo.getAll() { (result) in

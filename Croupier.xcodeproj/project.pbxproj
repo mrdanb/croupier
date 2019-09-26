@@ -27,6 +27,7 @@
 		01DC24A323317E4300F9B56E /* RepositoryError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC24A223317E4300F9B56E /* RepositoryError.swift */; };
 		01FE39E9233D58AB0065A5B9 /* Serializable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01FE39E8233D58AB0065A5B9 /* Serializable.swift */; };
 		01FE39EB233D58E60065A5B9 /* Syncing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01FE39EA233D58E60065A5B9 /* Syncing.swift */; };
+		01FE39EF233D65700065A5B9 /* Changes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01FE39EE233D65700065A5B9 /* Changes.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,6 +66,7 @@
 		01DC24B32331869800F9B56E /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		01FE39E8233D58AB0065A5B9 /* Serializable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Serializable.swift; sourceTree = "<group>"; };
 		01FE39EA233D58E60065A5B9 /* Syncing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Syncing.swift; sourceTree = "<group>"; };
+		01FE39EE233D65700065A5B9 /* Changes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Changes.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -123,6 +125,7 @@
 		01DC2450232C145000F9B56E /* Croupier */ = {
 			isa = PBXGroup;
 			children = (
+				01FE39EC233D65630065A5B9 /* Changes */,
 				016030C52339827400C37C96 /* Erasure */,
 				01DC24A123317E3700F9B56E /* Errors */,
 				01DC24AD23317F9500F9B56E /* Sources */,
@@ -218,6 +221,14 @@
 				01DC245F232C14F100F9B56E /* FoundationHTTPClient.swift */,
 			);
 			path = HTTP;
+			sourceTree = "<group>";
+		};
+		01FE39EC233D65630065A5B9 /* Changes */ = {
+			isa = PBXGroup;
+			children = (
+				01FE39EE233D65700065A5B9 /* Changes.swift */,
+			);
+			path = Changes;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -338,6 +349,7 @@
 				01DC2465232C152000F9B56E /* InMemoryRepository.swift in Sources */,
 				01DC249A2330304400F9B56E /* Source.swift in Sources */,
 				01FE39EB233D58E60065A5B9 /* Syncing.swift in Sources */,
+				01FE39EF233D65700065A5B9 /* Changes.swift in Sources */,
 				01DC2490232C1B1F00F9B56E /* CoreDataRepository.swift in Sources */,
 				01DC2460232C14F100F9B56E /* FoundationHTTPClient.swift in Sources */,
 				01DC24A023317E2600F9B56E /* Deleting.swift in Sources */,

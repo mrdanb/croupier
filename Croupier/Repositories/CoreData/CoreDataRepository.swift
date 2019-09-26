@@ -4,17 +4,15 @@ import CoreData
 public extension RepositoryError {
     enum CoreData: Error {
         case objectNotFoundInContext
-        case failedToFindObjectAfterSave
     }
 }
 
-public class CoreDataRepository<Response,Entity>: NSObject, NSFetchedResultsControllerDelegate, Repository where Response: Serializable, Response: Decodable, Response.Serialized == Entity, Response.Context == NSManagedObjectContext, Entity: NSManagedObject {
+public class CoreDataRepository<Response,Entity>: Repository where Response: Serializable, Response: Decodable, Response.Serialized == Entity, Response.Context == NSManagedObjectContext, Entity: NSManagedObject {
     private let context: NSManagedObjectContext
     private let source: Source
     private let responseDecoder: Decoding
     private let identifier: String
-    private var fetchResultsController: NSFetchedResultsController<Entity>?
-    private var synced: ((Result<[Entity],Error>) -> Void)?
+    private lazy var changes = Changes<Entity>()
 
     public init(source: Source,
                 responseDecoder: Decoding = JSONDecodableDecoder(),
@@ -24,22 +22,30 @@ public class CoreDataRepository<Response,Entity>: NSObject, NSFetchedResultsCont
         self.source = source
         self.responseDecoder = responseDecoder
         self.identifier = identifier
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(objectsDidChange),
+                                               name: .NSManagedObjectContextObjectsDidChange,
+                                               object: context)
+    }
+
+    @objc func objectsDidChange(notification: NSNotification) {
+        guard let userInfo = notification.userInfo else { return }
+        if let inserts = userInfo[NSInsertedObjectsKey] as? Set<Entity>, inserts.count > 0 {
+            inserts.forEach { changes.inserted($0) }
+        }
+
+        if let updates = userInfo[NSUpdatedObjectsKey] as? Set<Entity>, updates.count > 0 {
+            updates.forEach { changes.updated($0) }
+        }
+
+        if let deletes = userInfo[NSDeletedObjectsKey] as? Set<Entity>, deletes.count > 0 {
+            deletes.forEach { changes.deleted($0) }
+        }
     }
 
     private func createRequest() -> NSFetchRequest<Entity> {
         return NSFetchRequest(entityName: Entity.entity().name ?? String(describing: Entity.self))
-    }
-
-    private func performFetch(predicate: NSPredicate? = nil) throws {
-        let request = createRequest()
-        request.predicate = predicate
-        request.sortDescriptors = [NSSortDescriptor(key: identifier, ascending: true)]
-        fetchResultsController = NSFetchedResultsController(fetchRequest: request,
-                                                            managedObjectContext: context,
-                                                            sectionNameKeyPath: nil,
-                                                            cacheName: nil)
-        fetchResultsController?.delegate = self
-        try fetchResultsController?.performFetch()
     }
 
     public func get(forKey key: String, completion: @escaping (Result<Entity, Error>) -> Void) {
@@ -56,12 +62,25 @@ public class CoreDataRepository<Response,Entity>: NSObject, NSFetchedResultsCont
                 completion(.failure(error))
             }
         }
+    }
 
-//        let predicate = NSPredicate(format: "%K = %@", identifier, key)
+    public func getAll(completion: @escaping (Result<[Entity], Error>) -> Void) {
+        let request = createRequest()
+        context.perform {
+            do {
+                let result = try self.context.fetch(request)
+                guard result.count > 0 else {
+                    completion(.failure(RepositoryError.CoreData.objectNotFoundInContext))
+                    return
+                }
+                completion(.success(result))
+            } catch {
+                completion(.failure(error))
+            }
+        }
 //        do {
-//            prepareFetch(predicate: predicate)
 //            try performFetch()
-//            guard let result = fetchResultsController?.fetchedObjects?.first else {
+//            guard let result = fetchResultsController?.fetchedObjects else {
 //                throw RepositoryError.CoreData.objectNotFoundInContext
 //            }
 //            completion(.success(result))
@@ -70,29 +89,36 @@ public class CoreDataRepository<Response,Entity>: NSObject, NSFetchedResultsCont
 //        }
     }
 
-    public func getAll(completion: @escaping (Result<[Entity], Error>) -> Void) {
-        do {
-            try performFetch()
-            guard let result = fetchResultsController?.fetchedObjects else {
-                throw RepositoryError.CoreData.objectNotFoundInContext
-            }
-            completion(.success(result))
-        } catch {
-            completion(.failure(error))
-        }
-    }
-
     public func sync(key: String,
-                     completion: @escaping (Result<[Entity],Error>) -> Void) {
-
-        do { try performFetch() } catch {
-            completion(.failure(error))
-            return
-        }
-
+                     completion: @escaping (Result<Changes<Entity>,Error>) -> Void) {
+        changes.empty()
         source.data(for: key, parameters: nil) { (result) in
             DispatchQueue(label: "uk.co.dollop.decode.queue").async {
-                let result = result.flatMap({ (data) -> Result<[Entity],Error> in
+                switch result {
+                case .success(let data):
+                    do {
+                        let response = try self.responseDecoder.decode(Response.self, from: data)
+                        _ = try self.context.createBackgroundContext().sync({ (context) -> [Entity] in
+                            let result = response.serialize(context: context)
+                            try context.saveIfNeeded()
+                            return result
+                        })
+                    } catch {
+                        DispatchQueue.main.async { completion(.failure(error)) }
+                    }
+                case .failure(let error):
+                    DispatchQueue.main.async { completion(.failure(error)) }
+                }
+                DispatchQueue.main.async {
+                    do {
+                        try self.context.saveIfNeeded()
+                        completion(.success(self.changes))
+                    } catch {
+                        completion(.failure(error))
+                    }
+                }
+
+                /*let result = result.flatMap({ (data) -> Result<[Entity],Error> in
                     do {
                         let response = try self.responseDecoder.decode(Response.self, from: data)
                         let updates = try self.context.createBackgroundContext().sync({ (context) -> [Entity] in
@@ -105,25 +131,13 @@ public class CoreDataRepository<Response,Entity>: NSObject, NSFetchedResultsCont
                         return .failure(error)
                     }
                 })
-                DispatchQueue.main.async { completion(result) }
+                DispatchQueue.main.async { completion(result) }*/
             }
         }
     }
 
     public func delete(item: Entity, completion: @escaping (Result<Entity, Error>) -> Void) {
 
-    }
-
-    public func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>,
-                           didChange anObject: Any,
-                           at indexPath: IndexPath?,
-                           for type: NSFetchedResultsChangeType,
-                           newIndexPath: IndexPath?) {
-        // use this after syncing...
-    }
-
-    public func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        print("Will change...")
     }
 }
 
@@ -135,6 +149,8 @@ extension NSManagedObjectContext {
 
     func createBackgroundContext() -> NSManagedObjectContext {
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        context.undoManager = nil
+        context.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
         context.parent = self
         return context
     }
