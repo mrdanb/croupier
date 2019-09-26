@@ -21,11 +21,11 @@ class ViewController: UIViewController {
         let context = persistentContainer.viewContext
         let url = URL(string: "http://www.mocky.io/v2/")!
         let source = FoundationHTTPClient(baseURL: url)
-        let repo = CoreDataRepository(for: Game.self,
-                                      source: source,
-                                      context: context,
-                                      identifier: "identifier")
 
+        let repo = CoreDataRepository<GamesResponse, Game>(source: source, context: context, identifier: "identifier")
+        repo.sync(key: "5d8beb5d350000f745d472a1") { (result) in
+            //
+        }
 //        repo.sync(key: "5d8beb5d350000f745d472a1",
 //                  responseType: GamesResponse.self,
 //                  serialise: { (response, context) -> [Game] in
@@ -48,9 +48,9 @@ class ViewController: UIViewController {
 //            }
 //        }
 
-        repo.get(forKey: "123") { (result) in
-            print(result)
-        }
+//        repo.get(forKey: "123") { (result) in
+//            print(result)
+//        }
     }
 
     /*func createRepo() {
@@ -83,6 +83,16 @@ class ViewController: UIViewController {
 
 struct GamesResponse: Decodable {
     let games: [GameResponse]
+}
+
+extension GamesResponse: Serializing {
+    func serialize(context: NSManagedObjectContext) -> [Game] {
+        return games.compactMap({ (gameResponse) -> Game? in
+            guard let game =  NSEntityDescription.insertNewObject(forEntityName: "Game", into: context) as? Game else { return nil }
+            game.update(gameResponse)
+            return game
+        })
+    }
 }
 
 struct GameResponse: Decodable {

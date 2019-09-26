@@ -107,17 +107,32 @@ private extension NSManagedObjectContext {
     }
 }*/
 
+public protocol Serialiser {
+    associatedtype ResponseType
+    associatedtype ModelType
 
-public class CoreDataRepository<ModelType>: NSObject, NSFetchedResultsControllerDelegate, Repository where ModelType: NSManagedObject {
-    public typealias Context = NSManagedObjectContext
+    func serialise(response: ResponseType) -> [ModelType]
+}
+
+public class BlockSerialiser<ResponseType,ModelType>: Serialiser {
+    public typealias Closure = (ResponseType) -> [ModelType]
+    private let closure: Closure
+    public init(_ closure: @escaping Closure) {
+        self.closure = closure
+    }
+    public func serialise(response: ResponseType) -> [ModelType] {
+        return closure(response)
+    }
+}
+
+public class CoreDataRepository<Response,ModelType>: NSObject, NSFetchedResultsControllerDelegate, Repository where Response: Serializing, Response: Decodable, Response.Serialized == ModelType, Response.Context == NSManagedObjectContext, ModelType: NSManagedObject {
     private let context: NSManagedObjectContext
     private let source: Source
     private let responseDecoder: Decoding
     private let identifier: String
     private var fetchResultsController: NSFetchedResultsController<ModelType>?
 
-    public init(for type: ModelType.Type,
-                source: Source,
+    public init(source: Source,
                 responseDecoder: Decoding = JSONDecodableDecoder(),
                 context: NSManagedObjectContext,
                 identifier: String) {
@@ -187,48 +202,25 @@ public class CoreDataRepository<ModelType>: NSObject, NSFetchedResultsController
         }
     }
 
-    public func sync<ResponseType>(key: String,
-                                   responseType: ResponseType.Type,
-                                   serialise: @escaping (ResponseType, Context) -> [ModelType],
-                                   completion: @escaping (Result<Bool,Error>) -> Void) where ResponseType: Decodable {
-
-        prepareFetch()
-        try? performFetch()
+    public func sync(key: String,
+                     completion: @escaping (Result<[ModelType],Error>) -> Void) {
 
         source.data(for: key, parameters: nil) { (result) in
-            switch result {
-            case .success(let data):
-                DispatchQueue(label: "uk.co.dollop.decode.queue").async {
+            DispatchQueue(label: "uk.co.dollop.decode.queue").async {
+                let result = result.flatMap({ (data) -> Result<[ModelType],Error> in
                     do {
-                        let response = try self.responseDecoder.decode(ResponseType.self, from: data)
-                        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-                        context.parent = self.context
-                        context.performAndWait {
-                            let model = serialise(response, context)
-                            print(model)
-                            do {
-                                try context.saveIfNeeded()
-                            } catch {
-                                completion(.failure(error))
-                            }
-                        }
-                        DispatchQueue.main.async {
-                            completion(.success(true))
-//                            do {
-//                                try self.context.saveIfNeeded()
-//                                completion(.success(true))
-//                            }
-//                            catch {
-//                                completion(.failure(error))
-//                            }
-                        }
+                        let response = try self.responseDecoder.decode(Response.self, from: data)
+                        let updates = try self.context.createBackgroundContext().sync({ (context) -> [ModelType] in
+                            let result = response.serialize(context: context)
+                            try context.saveIfNeeded()
+                            return result
+                        })
+                        return .success(updates)
+                    } catch {
+                        return .failure(error)
                     }
-                    catch {
-                        print(error)
-                    }
-                }
-            case .failure(let error):
-                print(error)
+                })
+                DispatchQueue.main.async { completion(result) }
             }
         }
     }
@@ -249,4 +241,25 @@ public class CoreDataRepository<ModelType>: NSObject, NSFetchedResultsController
     public func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         print("Will change...")
     }
+}
+
+extension NSManagedObjectContext {
+    func createBackgroundContext() -> NSManagedObjectContext {
+        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        context.parent = self
+        return context
+    }
+
+    // Check if we still need to do this with xcode 11
+    func sync<T>(_ task: (NSManagedObjectContext) throws -> T) throws -> T {
+        var result: Result<T,Error>? = nil
+        performAndWait {
+            result = Result { try task(self) }
+        }
+        switch result! {
+        case .success(let value): return value
+        case .failure(let error): throw error
+        }
+    }
+
 }
