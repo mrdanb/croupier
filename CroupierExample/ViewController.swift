@@ -26,18 +26,6 @@ class ViewController: UIViewController {
         repo.sync(key: "5d8beb5d350000f745d472a1") { (result) in
             print(result)
         }
-//        repo.sync(key: "5d8beb5d350000f745d472a1",
-//                  responseType: GamesResponse.self,
-//                  serialise: { (response, context) -> [Game] in
-//                    return response.games.compactMap({ (gameResponse) -> Game? in
-//                        guard let game =  NSEntityDescription.insertNewObject(forEntityName: "Game", into: context) as? Game else { return nil }
-//                        game.update(gameResponse)
-//                        return game
-//                    })
-//
-//        }, completion:{ result in
-//            //
-//        })
 
 //        repo.getAll() { (result) in
 //            switch result {
@@ -52,40 +40,13 @@ class ViewController: UIViewController {
 //            print(result)
 //        }
     }
-
-    /*func createRepo() {
-        let url = URL(string: "http://www.mocky.io/v2/5d8a71053000005300b9a96c")!
-        let session = URLSession.shared
-        let context = persistentContainer.viewContext
-        context.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
-
-        CoreData.setup(context: context)
-
-        let decoding = CoreData.builder.decoder()
-        let source = FoundationHTTPClient(session: session, baseURL: url)
-        let store = CoreData.builder.repository(for: Games.self, primaryKey: "identifier")
-        let repo = RepositoryWithCache(for: Games.self,
-                                       decoder: decoding,
-                                       source: source,
-                                       cache: store)
-        self.repo = AnyRepository(repo)
-
-        self.repo?.getAll(completion: { (result) in
-            switch result {
-            case .success(let items):
-                print(items)
-            case .failure(let error):
-                print(error)
-            }
-        })
-    }*/
 }
 
 struct GamesResponse: Decodable {
     let games: [GameResponse]
 }
 
-extension GamesResponse: Serializing {
+extension GamesResponse: Serializable {
     func serialize(context: NSManagedObjectContext) -> [Game] {
         return games.compactMap({ (gameResponse) -> Game? in
             guard let game =  NSEntityDescription.insertNewObject(forEntityName: "Game", into: context) as? Game else { return nil }
@@ -109,27 +70,4 @@ class Game: NSManagedObject {
         self.identifier = game.identifier
         self.name = game.name
     }
-
-//    private enum CodingKeys: String, CodingKey {
-//        case identifier
-//        case name
-//    }
-//
-//    required convenience init(from decoder: Decoder) throws {
-//        guard let context = decoder.managedObjectContext,
-//            let entity = NSEntityDescription.entity(forEntityName: "Games", in: context) else {
-//            fatalError("No context found")
-//        }
-//        self.init(entity: entity, insertInto: context)
-//
-//        let container = try decoder.container(keyedBy: CodingKeys.self)
-//        identifier = try container.decode(String.self, forKey: .identifier)
-//        name = try container.decode(String.self, forKey: .name)
-//    }
-//
-//    func encode(to encoder: Encoder) throws {
-//        var container = encoder.container(keyedBy: CodingKeys.self)
-//        try container.encode(identifier, forKey: .identifier)
-//        try container.encode(name, forKey: .name)
-//    }
 }

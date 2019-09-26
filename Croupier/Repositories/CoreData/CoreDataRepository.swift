@@ -8,129 +8,13 @@ public extension RepositoryError {
     }
 }
 
-/*public final class CoreDataRepository<ModelType>: Repository where ModelType: NSManagedObject {
-
-    private let context: NSManagedObjectContext
-    private let primaryKey: String
-
-    init(for type: ModelType.Type, context: NSManagedObjectContext, primaryKey: String) {
-        self.context = context
-        self.primaryKey = primaryKey
-    }
-
-    public func get(forKey key: String,
-                    completion: @escaping (Result<ModelType, Error>) -> Void) {
-        context.perform { [weak self] in
-            guard let strongSelf = self else { return }
-            do {
-                let predicate = NSPredicate(format: "%K = %@", strongSelf.primaryKey, key)
-                guard let result: ModelType = try strongSelf.context.executeFetch(predicate: predicate)?.first else {
-                    throw RepositoryError.CoreData.objectNotFoundInContext
-                }
-                completion(.success(result))
-            } catch {
-                completion(.failure(error))
-            }
-        }
-    }
-
-    public func getAll(completion: @escaping (Result<[ModelType], Error>) -> Void) {
-        context.perform { [weak context] in
-            do {
-                guard let result: [ModelType] = try context?.executeFetch() else {
-                    throw RepositoryError.CoreData.objectNotFoundInContext
-                }
-                completion(.success(result))
-            } catch {
-                completion(.failure(error))
-            }
-        }
-    }
-
-    public func delete(item: ModelType,
-                       completion: @escaping (Result<ModelType, Error>) -> Void) {
-        context.perform { [weak context] in
-            context?.delete(item)
-            do {
-                try context?.saveIfNeeded()
-                completion(.success(item))
-            } catch {
-                completion(.failure(error))
-            }
-        }
-    }
-
-    public func store(item: ModelType,
-                      completion: @escaping (Result<ModelType, Error>) -> Void) {
-        do {
-            guard let item: ModelType = try context.executeFetch(predicate: NSPredicate(format: "self = %@", item.objectID))?.first else {
-                throw RepositoryError.CoreData.failedToFindObjectAfterSave
-            }
-            completion(.success(item))
-        } catch {
-            completion(.failure(error))
-        }
-    }
-
-    // TODO: XCode 11 == NSBatchInsertRequest
-    public func store(items: [ModelType],
-                      completion: @escaping (Result<[ModelType], Error>) -> Void) {
-        guard items.isEmpty == false else { return }
-        let objectIDs = items.map({ $0.objectID })
-        do {
-            guard let results: [ModelType] = try context.executeFetch(predicate: NSPredicate(format: "self IN %@", objectIDs)),
-                results.isEmpty == false else {
-                throw RepositoryError.CoreData.failedToFindObjectAfterSave
-            }
-            try context.saveIfNeeded()
-            completion(.success(results))
-        } catch {
-            completion(.failure(error))
-        }
-    }
-}
-
-private extension NSManagedObjectContext {
-
-    func executeFetch<T>(predicate: NSPredicate? = nil) throws -> [T]? where T: NSManagedObject {
-        let request = T.fetchRequest()
-        request.predicate = predicate
-        return try fetch(request) as? [T]
-    }
-
-    func performTaskInChildContext(task: @escaping (NSManagedObjectContext) -> Void) {
-        let backgroundContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        backgroundContext.parent = self
-        backgroundContext.perform {
-            task(backgroundContext)
-        }
-    }
-}*/
-
-public protocol Serialiser {
-    associatedtype ResponseType
-    associatedtype ModelType
-
-    func serialise(response: ResponseType) -> [ModelType]
-}
-
-public class BlockSerialiser<ResponseType,ModelType>: Serialiser {
-    public typealias Closure = (ResponseType) -> [ModelType]
-    private let closure: Closure
-    public init(_ closure: @escaping Closure) {
-        self.closure = closure
-    }
-    public func serialise(response: ResponseType) -> [ModelType] {
-        return closure(response)
-    }
-}
-
-public class CoreDataRepository<Response,Entity>: NSObject, NSFetchedResultsControllerDelegate, Repository where Response: Serializing, Response: Decodable, Response.Serialized == Entity, Response.Context == NSManagedObjectContext, Entity: NSManagedObject {
+public class CoreDataRepository<Response,Entity>: NSObject, NSFetchedResultsControllerDelegate, Repository where Response: Serializable, Response: Decodable, Response.Serialized == Entity, Response.Context == NSManagedObjectContext, Entity: NSManagedObject {
     private let context: NSManagedObjectContext
     private let source: Source
     private let responseDecoder: Decoding
     private let identifier: String
     private var fetchResultsController: NSFetchedResultsController<Entity>?
+    private var synced: ((Result<[Entity],Error>) -> Void)?
 
     public init(source: Source,
                 responseDecoder: Decoding = JSONDecodableDecoder(),
@@ -236,7 +120,6 @@ public class CoreDataRepository<Response,Entity>: NSObject, NSFetchedResultsCont
                            for type: NSFetchedResultsChangeType,
                            newIndexPath: IndexPath?) {
         // use this after syncing...
-        print("Object changed: \(anObject)")
     }
 
     public func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
