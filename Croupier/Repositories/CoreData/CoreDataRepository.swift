@@ -78,15 +78,16 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
                 completion(.failure(error))
             }
         }
-//        do {
-//            try performFetch()
-//            guard let result = fetchResultsController?.fetchedObjects else {
-//                throw RepositoryError.CoreData.objectNotFoundInContext
-//            }
-//            completion(.success(result))
-//        } catch {
-//            completion(.failure(error))
-//        }
+    }
+
+    private func serialize(data: Data) throws -> [Entity] {
+        let response = try self.responseDecoder.decode(Response.self, from: data)
+        let entities = try self.context.createBackgroundContext().sync({ (context) -> [Entity] in
+            let result = response.serialize(context: context)
+            try context.saveIfNeeded()
+            return result
+        })
+        return entities
     }
 
     public func sync(key: String,
@@ -94,44 +95,26 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
         changes.empty()
         source.data(for: key, parameters: nil) { (result) in
             DispatchQueue(label: "uk.co.dollop.decode.queue").async {
-                switch result {
-                case .success(let data):
+                let result = result.flatMap({ (data) -> Result<[Entity], Error> in
                     do {
-                        let response = try self.responseDecoder.decode(Response.self, from: data)
-                        _ = try self.context.createBackgroundContext().sync({ (context) -> [Entity] in
-                            let result = response.serialize(context: context)
-                            try context.saveIfNeeded()
-                            return result
-                        })
-                    } catch {
-                        DispatchQueue.main.async { completion(.failure(error)) }
-                    }
-                case .failure(let error):
-                    DispatchQueue.main.async { completion(.failure(error)) }
-                }
-                DispatchQueue.main.async {
-                    do {
-                        try self.context.saveIfNeeded()
-                        completion(.success(self.changes))
-                    } catch {
-                        completion(.failure(error))
-                    }
-                }
-
-                /*let result = result.flatMap({ (data) -> Result<[Entity],Error> in
-                    do {
-                        let response = try self.responseDecoder.decode(Response.self, from: data)
-                        let updates = try self.context.createBackgroundContext().sync({ (context) -> [Entity] in
-                            let result = response.serialize(context: context)
-                            try context.saveIfNeeded()
-                            return result
-                        })
-                        return .success(updates)
+                        let entities = try self.serialize(data: data)
+                        return .success(entities)
                     } catch {
                         return .failure(error)
                     }
                 })
-                DispatchQueue.main.async { completion(result) }*/
+                DispatchQueue.main.async {
+                    completion(
+                        result.flatMap({ (_) -> Result<Changes<Entity>, Error> in
+                            do {
+                                try self.context.saveIfNeeded()
+                                return .success(self.changes)
+                            } catch {
+                                return .failure(error)
+                            }
+                        })
+                    )
+                }
             }
         }
     }
