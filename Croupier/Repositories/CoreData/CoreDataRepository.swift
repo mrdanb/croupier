@@ -120,7 +120,15 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
     }
 
     public func delete(item: Entity, completion: @escaping (Result<Entity, Error>) -> Void) {
-
+        context.perform {
+            self.context.delete(item)
+            do {
+                try self.context.saveIfNeeded()
+                completion(.success(item))
+            } catch {
+                completion(.failure(error))
+            }
+        }
     }
 }
 
