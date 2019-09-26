@@ -125,12 +125,12 @@ public class BlockSerialiser<ResponseType,ModelType>: Serialiser {
     }
 }
 
-public class CoreDataRepository<Response,ModelType>: NSObject, NSFetchedResultsControllerDelegate, Repository where Response: Serializing, Response: Decodable, Response.Serialized == ModelType, Response.Context == NSManagedObjectContext, ModelType: NSManagedObject {
+public class CoreDataRepository<Response,Entity>: NSObject, NSFetchedResultsControllerDelegate, Repository where Response: Serializing, Response: Decodable, Response.Serialized == Entity, Response.Context == NSManagedObjectContext, Entity: NSManagedObject {
     private let context: NSManagedObjectContext
     private let source: Source
     private let responseDecoder: Decoding
     private let identifier: String
-    private var fetchResultsController: NSFetchedResultsController<ModelType>?
+    private var fetchResultsController: NSFetchedResultsController<Entity>?
 
     public init(source: Source,
                 responseDecoder: Decoding = JSONDecodableDecoder(),
@@ -142,11 +142,11 @@ public class CoreDataRepository<Response,ModelType>: NSObject, NSFetchedResultsC
         self.identifier = identifier
     }
 
-    private func createRequest() -> NSFetchRequest<ModelType> {
-        return NSFetchRequest(entityName: ModelType.entity().name ?? String(describing: ModelType.self))
+    private func createRequest() -> NSFetchRequest<Entity> {
+        return NSFetchRequest(entityName: Entity.entity().name ?? String(describing: Entity.self))
     }
 
-    private func prepareFetch(predicate: NSPredicate? = nil) {
+    private func performFetch(predicate: NSPredicate? = nil) throws {
         let request = createRequest()
         request.predicate = predicate
         request.sortDescriptors = [NSSortDescriptor(key: identifier, ascending: true)]
@@ -155,13 +155,10 @@ public class CoreDataRepository<Response,ModelType>: NSObject, NSFetchedResultsC
                                                             sectionNameKeyPath: nil,
                                                             cacheName: nil)
         fetchResultsController?.delegate = self
-    }
-
-    private func performFetch() throws {
         try fetchResultsController?.performFetch()
     }
 
-    public func get(forKey key: String, completion: @escaping (Result<ModelType, Error>) -> Void) {
+    public func get(forKey key: String, completion: @escaping (Result<Entity, Error>) -> Void) {
         let request = createRequest()
         request.predicate = NSPredicate(format: "%K = %@", identifier, key)
         context.perform {
@@ -189,9 +186,8 @@ public class CoreDataRepository<Response,ModelType>: NSObject, NSFetchedResultsC
 //        }
     }
 
-    public func getAll(completion: @escaping (Result<[ModelType], Error>) -> Void) {
+    public func getAll(completion: @escaping (Result<[Entity], Error>) -> Void) {
         do {
-            prepareFetch()
             try performFetch()
             guard let result = fetchResultsController?.fetchedObjects else {
                 throw RepositoryError.CoreData.objectNotFoundInContext
@@ -203,14 +199,19 @@ public class CoreDataRepository<Response,ModelType>: NSObject, NSFetchedResultsC
     }
 
     public func sync(key: String,
-                     completion: @escaping (Result<[ModelType],Error>) -> Void) {
+                     completion: @escaping (Result<[Entity],Error>) -> Void) {
+
+        do { try performFetch() } catch {
+            completion(.failure(error))
+            return
+        }
 
         source.data(for: key, parameters: nil) { (result) in
             DispatchQueue(label: "uk.co.dollop.decode.queue").async {
-                let result = result.flatMap({ (data) -> Result<[ModelType],Error> in
+                let result = result.flatMap({ (data) -> Result<[Entity],Error> in
                     do {
                         let response = try self.responseDecoder.decode(Response.self, from: data)
-                        let updates = try self.context.createBackgroundContext().sync({ (context) -> [ModelType] in
+                        let updates = try self.context.createBackgroundContext().sync({ (context) -> [Entity] in
                             let result = response.serialize(context: context)
                             try context.saveIfNeeded()
                             return result
@@ -225,7 +226,7 @@ public class CoreDataRepository<Response,ModelType>: NSObject, NSFetchedResultsC
         }
     }
 
-    public func delete(item: ModelType, completion: @escaping (Result<ModelType, Error>) -> Void) {
+    public func delete(item: Entity, completion: @escaping (Result<Entity, Error>) -> Void) {
 
     }
 

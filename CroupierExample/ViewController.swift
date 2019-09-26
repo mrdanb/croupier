@@ -24,7 +24,7 @@ class ViewController: UIViewController {
 
         let repo = CoreDataRepository<GamesResponse, Game>(source: source, context: context, identifier: "identifier")
         repo.sync(key: "5d8beb5d350000f745d472a1") { (result) in
-            //
+            print(result)
         }
 //        repo.sync(key: "5d8beb5d350000f745d472a1",
 //                  responseType: GamesResponse.self,

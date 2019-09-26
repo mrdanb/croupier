@@ -1,9 +1,9 @@
 import Foundation
 
 public protocol Fetching {
-    associatedtype ModelType
+    associatedtype Entity
     func get(forKey key: String,
-             completion: @escaping (Result<ModelType, Error>) -> Void)
+             completion: @escaping (Result<Entity, Error>) -> Void)
 
-    func getAll(completion: @escaping (Result<[ModelType], Error>) -> Void)
+    func getAll(completion: @escaping (Result<[Entity], Error>) -> Void)
 }
