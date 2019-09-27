@@ -5,7 +5,7 @@ Here to assist you your swift development by syncing, fetching and deleting your
 
 ## Fetching
 ```swift
-let repository: Repository<Response, User> = …
+let repository: AnyRepository<Response, User> = …
 
 repository.get(forKey: "example-identifier") { (result) in
     switch result {
@@ -24,11 +24,11 @@ repository.getAll { (result) in
 
 ## Syncing
 ```swift
-let repository: Repository<Response, User> = …
+let repository: AnyRepository<Response, User> = …
 
 repository.sync(key: "/users/example-identifier") { (result) in
     switch result {
-    case .success(let changes): // Handle changes - represented by type `Changes<Entity>`
+    case .success(let changes): // Handle changes - represented by type `Changes<User>`
     case .failure(let error): // Handle error
     }
 }
@@ -37,12 +37,12 @@ repository.sync(key: "/users/example-identifier") { (result) in
 
 ## Deleting
 ```swift
-let repository: Repository<Response, User> = …
+let repository: AnyRepository<Response, User> = …
 
-let item: Entity
+let item: User
 repository.delete(item: item) { (result) in
     switch result {
-    case .success(let item): // Handle item of type `Entity`
+    case .success(let item): // Handle item of type `User`
     case .failure(let error): // Handle error
     }
 }
