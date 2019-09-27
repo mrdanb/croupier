@@ -5,8 +5,19 @@ Here to assist you your swift development by syncing, fetching and deleting your
 
 ## Fetching
 ```swift
-func get(forKey key: String, completion: @escaping (Result<Entity, Error>) -> Void)
-func getAll(completion: @escaping (Result<[Entity], Error>) -> Void)
+repository.get(forKey: "example-identifier") { (result) in
+    switch result {
+    case .success(let item): // Use item...
+    case .failure(let error): // handle error...
+    }
+}
+
+repository.getAll { (result) in
+    switch result {
+    case .success(let items): // Use items...
+    case .failure(let error): // Handle error...
+    }
+}
 ```
 
 ## Syncing
@@ -41,6 +52,8 @@ let source = URLSessionDataSource(baseURL: url)
  As well as the source and context you will need to set the identifier for the repository.
  This is the name of the property that will be used to match the key against when fetching entities.
 */
-let repository = CoreDataRepository<GamesResponse, Game>(source: source, context: context, identifier: "identifier")
+let repository = CoreDataRepository<GamesResponse, Game>(source: source, 
+                                                        context: context, 
+                                                        identifier: "identifier")
 
 ```
