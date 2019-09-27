@@ -5,7 +5,7 @@ Here to assist you your swift development by syncing, fetching and deleting your
 
 ## Setup
 
-### • CoreData
+### 🗃 CoreData
 ```swift
 // Setup your CoreData stack as usual.
 let context = persistentContainer.viewContext
@@ -27,6 +27,11 @@ let source = URLSessionDataSource(baseURL: url)
 let repository = CoreDataRepository<GamesResponse, Game>(source: source, 
                                                          context: context, 
                                                          identifier: "identifier")
+
+```
+
+### In-memory
+```
 
 ```
 
@@ -73,4 +78,25 @@ repository.delete(item: item) { (result) in
     case .failure(let error): // Handle error
     }
 }
+```
+
+## Changes
+
+When performing a sync the result success type will be a `Changes` object.
+This struct holds any entities that have been: inserted, deleted or updated.
+
+You can access these by using the three collections:
+```
+changes.inserted
+```
+```
+changes.deleted
+```
+```
+changes.updated
+```
+
+Or by using the helper method `changes(for type:)`:
+```
+let inserted = changes.changes(for: .inserted)
 ```
