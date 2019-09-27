@@ -3,29 +3,27 @@
 ### The repository pattern library
 Here to assist you your swift development by syncing, fetching and deleting your entity classes.
 
-##  Actions
-
-### Fetching
-```
+## Fetching
+```swift
 func get(forKey key: String, completion: @escaping (Result<Entity, Error>) -> Void)
 func getAll(completion: @escaping (Result<[Entity], Error>) -> Void)
 ```
 
-### Syncing
-```
+## Syncing
+```swift
 func sync(key: String,
 completion: @escaping (Result<Changes<Entity>,Error>) -> Void)
 ```
 
-### Deleting
-```
+## Deleting
+```swift
 func delete(item: Entity, completion: @escaping (Result<Entity, Error>) -> Void)
 ```
 
 ## Examples
 
 ### CoreData
-```
+```swift
 // Setup your CoreData stack as usual.
 let context = persistentContainer.viewContext
 context.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
