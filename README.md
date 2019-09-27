@@ -83,7 +83,10 @@ repository.delete(item: item) { (result) in
 ## Changes
 
 When performing a sync the result success type will be a `Changes` object.
-This struct holds any entities that have been: inserted, deleted or updated.
+```
+struct Changes<Entity>
+```
+This struct holds any entities that have been inserted, deleted or updated.
 
 You can access these by using the three collections accessors: `changes.inserted`, `changes.deleted` and  `changes.updated`
 
