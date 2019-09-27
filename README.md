@@ -30,9 +30,9 @@ let repository = CoreDataRepository<GamesResponse, Game>(source: source,
 
 ```
 
-### In-memory
+### 📱 In-memory
 ```
-
+ Coming soon...
 ```
 
 ## Fetching
