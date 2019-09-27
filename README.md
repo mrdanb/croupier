@@ -3,6 +3,33 @@
 ### The repository pattern library
 Here to assist you your swift development by syncing, fetching and deleting your entity classes.
 
+## Setup
+
+### CoreData
+```swift
+// Setup your CoreData stack as usual.
+let context = persistentContainer.viewContext
+context.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
+
+// Create a `Source` for your data. In this case we will use Croupier's `URLSessionDataSource`.
+let url = URL(string: "http://www.example.api.com/")!
+let source = URLSessionDataSource(baseURL: url)
+
+/*
+Initialize the repository.
+
+Here you need to declare your response and entity types.
+For this example we are using `ConfigurationResponse` and `Configuration` in your implementation these will be different.
+
+As well as the source and context you will need to set the identifier for the repository.
+This is the name of the property that will be used to match the key against when fetching entities.
+*/
+let repository = CoreDataRepository<GamesResponse, Game>(source: source, 
+context: context, 
+identifier: "identifier")
+
+```
+
 ## Fetching
 ```swift
 let repository: AnyRepository<Response, User> = …
@@ -46,31 +73,4 @@ repository.delete(item: item) { (result) in
     case .failure(let error): // Handle error
     }
 }
-```
-
-## Examples
-
-### CoreData
-```swift
-// Setup your CoreData stack as usual.
-let context = persistentContainer.viewContext
-context.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
-
-// Create a `Source` for your data. In this case we will use Croupier's `URLSessionDataSource`.
-let url = URL(string: "http://www.example.api.com/")!
-let source = URLSessionDataSource(baseURL: url)
-
-/*
- Initialize the repository.
-
- Here you need to declare your response and entity types.
- For this example we are using `ConfigurationResponse` and `Configuration` in your implementation these will be different.
-
- As well as the source and context you will need to set the identifier for the repository.
- This is the name of the property that will be used to match the key against when fetching entities.
-*/
-let repository = CoreDataRepository<GamesResponse, Game>(source: source, 
-                                                        context: context, 
-                                                        identifier: "identifier")
-
 ```
