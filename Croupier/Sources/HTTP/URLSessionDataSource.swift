@@ -1,6 +1,6 @@
 import Foundation
 
-public final class FoundationHTTPClient: Source {
+public final class URLSessionDataSource: Source {
     enum Error: Swift.Error {
         case invalidURL
         case invalidParameters

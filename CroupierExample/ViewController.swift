@@ -21,29 +21,16 @@ class ViewController: UIViewController {
         let context = persistentContainer.viewContext
         context.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
         let url = URL(string: "http://www.mocky.io/v2/")!
-        let source = FoundationHTTPClient(baseURL: url)
+        let source = URLSessionDataSource(baseURL: url)
 
-        let repo = CoreDataRepository<GamesResponse, Game>(source: source, context: context, identifier: "identifier")
-        repo.sync(key: "5d8beb5d350000f745d472a1") { (result) in
-            switch result {
-            case .success(let changes):
-                print(changes)
-            case .failure(let error):
-                print(error)
-            }
-        }
-
-//        repo.getAll() { (result) in
+//        let repo = CoreDataRepository<GamesResponse, Game>(source: source, context: context, identifier: "identifier")
+//        repo.sync(key: "5d8beb5d350000f745d472a1") { (result) in
 //            switch result {
-//            case .success(let items):
-//                print(items)
+//            case .success(let changes):
+//                print(changes)
 //            case .failure(let error):
 //                print(error)
 //            }
-//        }
-
-//        repo.get(forKey: "123") { (result) in
-//            print(result)
 //        }
     }
 }
@@ -59,12 +46,19 @@ extension GamesResponse: Serializable {
             game.update(gameResponse)
             return game
         })
-    }
-}
+    }}
 
 struct GameResponse: Decodable {
     let identifier: String
     let name: String
+}
+
+struct Configuration: Equatable, Decodable, Serializable {
+    let isValid: Bool
+    let versionNumber: String
+    func serialize(context: AnyRepository<Configuration,Configuration>) -> [Configuration] {
+        return [self]
+    }
 }
 
 @objc(Game)

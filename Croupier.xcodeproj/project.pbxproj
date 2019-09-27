@@ -11,7 +11,7 @@
 		01BCB1DA233ACB7600714F1D /* JSONDecodableDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01BCB1D9233ACB7600714F1D /* JSONDecodableDecoder.swift */; };
 		01DC2453232C145000F9B56E /* Croupier.h in Headers */ = {isa = PBXBuildFile; fileRef = 01DC2451232C145000F9B56E /* Croupier.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		01DC245B232C147C00F9B56E /* Repository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC245A232C147C00F9B56E /* Repository.swift */; };
-		01DC2460232C14F100F9B56E /* FoundationHTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC245F232C14F100F9B56E /* FoundationHTTPClient.swift */; };
+		01DC2460232C14F100F9B56E /* URLSessionDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC245F232C14F100F9B56E /* URLSessionDataSource.swift */; };
 		01DC2465232C152000F9B56E /* InMemoryRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC2464232C152000F9B56E /* InMemoryRepository.swift */; };
 		01DC247A232C1A0600F9B56E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC2479232C1A0600F9B56E /* AppDelegate.swift */; };
 		01DC247C232C1A0600F9B56E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01DC247B232C1A0600F9B56E /* ViewController.swift */; };
@@ -47,7 +47,7 @@
 		01DC2451232C145000F9B56E /* Croupier.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Croupier.h; sourceTree = "<group>"; };
 		01DC2452232C145000F9B56E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		01DC245A232C147C00F9B56E /* Repository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Repository.swift; sourceTree = "<group>"; };
-		01DC245F232C14F100F9B56E /* FoundationHTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoundationHTTPClient.swift; sourceTree = "<group>"; };
+		01DC245F232C14F100F9B56E /* URLSessionDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionDataSource.swift; sourceTree = "<group>"; };
 		01DC2464232C152000F9B56E /* InMemoryRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InMemoryRepository.swift; sourceTree = "<group>"; };
 		01DC2477232C1A0600F9B56E /* CroupierExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CroupierExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		01DC2479232C1A0600F9B56E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -218,7 +218,7 @@
 		01DC24AE23317F9B00F9B56E /* HTTP */ = {
 			isa = PBXGroup;
 			children = (
-				01DC245F232C14F100F9B56E /* FoundationHTTPClient.swift */,
+				01DC245F232C14F100F9B56E /* URLSessionDataSource.swift */,
 			);
 			path = HTTP;
 			sourceTree = "<group>";
@@ -351,7 +351,7 @@
 				01FE39EB233D58E60065A5B9 /* Syncing.swift in Sources */,
 				01FE39EF233D65700065A5B9 /* Changes.swift in Sources */,
 				01DC2490232C1B1F00F9B56E /* CoreDataRepository.swift in Sources */,
-				01DC2460232C14F100F9B56E /* FoundationHTTPClient.swift in Sources */,
+				01DC2460232C14F100F9B56E /* URLSessionDataSource.swift in Sources */,
 				01DC24A023317E2600F9B56E /* Deleting.swift in Sources */,
 				016030C72339828A00C37C96 /* AnyRepository.swift in Sources */,
 				01FE39E9233D58AB0065A5B9 /* Serializable.swift in Sources */,
