@@ -1,6 +1,6 @@
 #  Croupier 🃏
 
-### ⚠️ This is a pre-alpha library currently under development ⚠️
+#### ⚠️ This is a pre-alpha library currently under development ⚠️
 
 ### The repository pattern library
 Here to assist you your swift development by syncing, fetching and deleting your entity classes.
