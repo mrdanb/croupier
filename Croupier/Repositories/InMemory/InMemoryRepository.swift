@@ -1,41 +1,53 @@
 import Foundation
 
-/*public final class InMemoryRepository<ModelType>: Repository where ModelType: Item {
+public final class InMemoryRepository<Response, Entity>: Repository where Response: Serializable & Decodable & Equatable, Response.Serialized == Entity, Response.Context == AnyRepository<Response,Entity> {
 
-    private var map: [String: ModelType]
+    private let source: Source
+    private let responseDecoder: Decoding
+    private lazy var map = [String: Entity]()
 
-    public init() {
-        map = [:]
+    public init(source: Source,
+                responseDecoder: Decoding = JSONDecodableDecoder()) {
+        self.source = source
+        self.responseDecoder = responseDecoder
     }
 
-    public func get(forKey key: String,
-                    completion: @escaping (Result<ModelType, Error>) -> Void) {
-        if let item = map[key] {
-            completion(.success(item))
-        } else {
-            completion(.failure(RepositoryError.notFound))
+    public func sync(key: String, completion: @escaping (Result<Changes<Entity>,Error>) -> Void) {
+        source.data(for: key, parameters: nil) { (data) in
+            DispatchQueue(label: "uk.co.dollop.decode.queue").async {
+                let result = data.flatMap({ (data) -> Result<Changes<Entity>,Error> in
+                    do {
+                        let response = try self.responseDecoder.decode(Response.self, from: data)
+                        _ = response.serialize(context: AnyRepository(self))
+                        // Could potentially use the collection diffing API in Swift 5.1?
+                        // Array(map.values).difference(from: result)
+                        // What key do we use to store each entity as?
+                        return .success(Changes<Entity>())
+                    } catch {
+                        return .failure(error)
+                    }
+                })
+                DispatchQueue.main.async { completion(result) }
+            }
         }
     }
 
-    public func getAll(completion: (Result<[ModelType], Error>) -> Void) {
+    public func get(forKey key: String, completion: @escaping (Result<Entity, Error>) -> Void) {
+        guard let item = map[key] else {
+            completion(.failure(RepositoryError.notFound))
+            return
+        }
+        completion(.success(item))
+    }
+
+    public func getAll(completion: @escaping (Result<[Entity], Error>) -> Void) {
         let all = Array(map.values)
         completion(.success(all))
     }
 
-    public func delete(item: ModelType,
-                       completion: @escaping (Result<ModelType, Error>) -> Void) {
-        map.removeValue(forKey: item.primaryKey)
-        completion(.success(item))
-    }
-
-    public func store(item: ModelType,
-                      completion: @escaping (Result<ModelType, Error>) -> Void) {
-        map[item.primaryKey] = item
-        completion(.success(item))
+    public func delete(item: Entity, completion: @escaping (Result<Entity, Error>) -> Void) {
+        map.values.forEach { (entity) in
+            // Equatable?
+        }
     }
 }
-
-public protocol Item {
-    var primaryKey: String { get }
-}
-*/
