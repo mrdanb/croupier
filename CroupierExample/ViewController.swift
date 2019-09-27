@@ -32,6 +32,7 @@ class ViewController: UIViewController {
                 print(error)
             }
         }
+        print(repo)
 
 //        repo.getAll() { (result) in
 //            switch result {

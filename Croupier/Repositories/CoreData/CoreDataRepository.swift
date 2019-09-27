@@ -157,5 +157,11 @@ extension NSManagedObjectContext {
         case .failure(let error): throw error
         }
     }
+}
 
+extension CoreDataRepository: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        let address = Unmanaged<AnyObject>.passUnretained(self as AnyObject).toOpaque()
+        return "<CoreDataRepository: \(address)> (primaryKey: \"\(identifier)\", source: \(source), decoder: \(responseDecoder))"
+    }
 }
