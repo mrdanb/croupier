@@ -1,31 +1,32 @@
 import Foundation
 
-public struct AnyRepository<ModelType>: Repository {
+public struct AnyRepository<Response,Entity>: Repository where Response: Serializable {
 
-    private let _get: (String, @escaping (Result<ModelType,Error>) -> Void) -> Void
-    private let _getAll: (@escaping (Result<[ModelType],Error>) -> Void) -> Void
-    private let _store: (ModelType, @escaping (Result<ModelType,Error>) -> Void) -> Void
-    private let _delete: (ModelType, @escaping (Result<ModelType,Error>) -> Void) -> Void
-    public init<Repo>(_ repository: Repo) where Repo: Repository, Repo.ModelType == ModelType {
+    private let _get: (String, @escaping (Result<Entity,Error>) -> Void) -> Void
+    private let _getAll: (@escaping (Result<[Entity],Error>) -> Void) -> Void
+    private let _sync: (String, @escaping (Result<Changes<Entity>,Error>) -> Void) -> Void
+    private let _delete: (Entity, @escaping (Result<Entity,Error>) -> Void) -> Void
+    public init<Repo>(_ repository: Repo) where Repo: Repository, Repo.Entity == Entity {
         _get = repository.get
         _getAll = repository.getAll
-        _store = repository.store
+        _sync = repository.sync
         _delete = repository.delete
     }
 
-    public func get(forKey key: String, completion: @escaping (Result<ModelType, Error>) -> Void) {
+    public func get(forKey key: String, completion: @escaping (Result<Entity, Error>) -> Void) {
         _get(key, completion)
     }
 
-    public func getAll(completion: @escaping (Result<[ModelType], Error>) -> Void) {
+    public func getAll(completion: @escaping (Result<[Entity], Error>) -> Void) {
         _getAll(completion)
     }
 
-    public func store(item: ModelType, completion: @escaping (Result<ModelType, Error>) -> Void) {
-        _store(item, completion)
+    public func sync(key: String, completion: @escaping (Result<Changes<Entity>, Error>) -> Void) {
+        _sync(key, completion)
     }
 
-    public func delete(item: ModelType, completion: @escaping (Result<ModelType, Error>) -> Void) {
+    public func delete(item: Entity, completion: @escaping (Result<Entity, Error>) -> Void) {
         _delete(item, completion)
     }
 }
+

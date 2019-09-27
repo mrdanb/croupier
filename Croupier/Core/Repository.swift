@@ -1,3 +1,3 @@
 import Foundation
 
-public typealias Repository = Fetching & Storing & Deleting
+public typealias Repository = Fetching & Syncing & Deleting

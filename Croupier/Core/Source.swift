@@ -1,4 +1,5 @@
 import Foundation
+import CoreData
 
 public protocol Source {
     func data(for key: String,
