@@ -25,6 +25,22 @@ public struct Changes<Entity> {
         inserted.removeAll()
         updated.removeAll()
     }
+
+    public func changes(for type: ChangeType) -> [Entity] {
+        switch type {
+        case .deleted: return deleted
+        case.inserted: return inserted
+        case .updated: return updated
+        }
+    }
+}
+
+public  extension Changes {
+    enum ChangeType {
+        case inserted
+        case deleted
+        case updated
+    }
 }
 
 extension Changes: CustomDebugStringConvertible {
