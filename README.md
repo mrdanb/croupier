@@ -1,19 +1,48 @@
 #  Croupier 🃏
 
-## The repository pattern library
-Here to assist you with your swift development by dealing with and distrubuting your model classes with ease.
+### The repository pattern library
+Here to assist you your swift development by syncing, fetching and deleting your entity classes.
 
-### Examples
+##  Actions
 
-#### CoreData:
+### Fetching
 ```
-CoreData.setup(context: context) // Must be called before using CoreData.builder
+func get(forKey key: String, completion: @escaping (Result<Entity, Error>) -> Void)
+func getAll(completion: @escaping (Result<[Entity], Error>) -> Void)
+```
 
-let source = FoundationHTTPClient(session: session)
-let decoding = CoreData.builder.decoder()
-let store = CoreData.builder.repository(for: Games.self, primaryKey: "identifier")
-let repo = RepositoryWithCache(for: Games.self, baseUrl: url, decoder: decoding, source: source, cache: store)
+### Syncing
+```
+func sync(key: String,
+completion: @escaping (Result<Changes<Entity>,Error>) -> Void)
+```
 
-self.repo = AnyRepository(repo)
+### Deleting
+```
+func delete(item: Entity, completion: @escaping (Result<Entity, Error>) -> Void)
+```
+
+## Examples
+
+### CoreData
+```
+// Setup your CoreData stack as usual.
+let context = persistentContainer.viewContext
+context.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
+
+// Create a `Source` for your data. In this case we will use Croupier's `URLSessionDataSource`.
+let url = URL(string: "http://www.mocky.io/v2/")!
+let source = URLSessionDataSource(baseURL: url)
+
+/*
+ Initialize the repository.
+
+ Here you need to declare your response and entity types.
+ For this example we are using `ConfigurationResponse` and `Configuration` in your implementation these will be different.
+
+ As well as the source and context you will need to set the identifier for the repository.
+ This is the name of the property that will be used to match the key against when fetching entities.
+*/
+let repository = CoreDataRepository<GamesResponse, Game>(source: source, context: context, identifier: "identifier")
 
 ```

@@ -14,24 +14,27 @@ class ViewController: UIViewController {
         return container
     }()
 
-//    var repo: AnyRepository<Games>?
-
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        // Setup your CoreData stack as usual.
         let context = persistentContainer.viewContext
         context.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
+
+        // Create a `Source` for your data. In this case we will use Croupier's `URLSessionDataSource`.
         let url = URL(string: "http://www.mocky.io/v2/")!
         let source = URLSessionDataSource(baseURL: url)
 
-//        let repo = CoreDataRepository<GamesResponse, Game>(source: source, context: context, identifier: "identifier")
-//        repo.sync(key: "5d8beb5d350000f745d472a1") { (result) in
-//            switch result {
-//            case .success(let changes):
-//                print(changes)
-//            case .failure(let error):
-//                print(error)
-//            }
-//        }
+        /*
+         Initialize the repository.
+
+         Here you need to declare your response and entity types.
+         For this example we are using `ConfigurationResponse` and `Configuration` in your implementation these will be different.
+
+         As well as the source and context you will need to set the identifier for the repository.
+         This is the name of the property that will be used to match the key against when fetching entities.
+         */
+        let repository = CoreDataRepository<GamesResponse, Game>(source: source, context: context, identifier: "identifier")
     }
 }
 
