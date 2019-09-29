@@ -21,9 +21,9 @@ class ViewController: UIViewController {
         let context = persistentContainer.viewContext
         context.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
 
-        // Create a `Source` for your data. In this case we will use Croupier's `URLSessionDataSource`.
+        // Create a `Source` for your data. In this case we will use Croupier's `HTTPSource`.
         let url = URL(string: "http://www.mocky.io/v2/")!
-        let source = URLSessionDataSource(baseURL: url)
+        let source = HTTPSource(baseURL: url)
 
         /*
          Initialize the repository.
