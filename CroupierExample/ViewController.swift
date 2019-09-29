@@ -35,6 +35,14 @@ class ViewController: UIViewController {
          This is the name of the property that will be used to match the key against when fetching entities.
          */
         let repository = CoreDataRepository<GamesResponse, Game>(source: source, context: context, identifier: "identifier")
+        repository.sync(key: "5d8beb5d350000f745d472a1") { (result) in
+            switch result {
+            case .success(let changes):
+                print(changes)
+            case .failure(let error):
+                print(error)
+            }
+        }
     }
 }
 
@@ -49,7 +57,8 @@ extension GamesResponse: Serializable {
             game.update(gameResponse)
             return game
         })
-    }}
+    }
+}
 
 struct GameResponse: Decodable {
     let identifier: String
@@ -59,9 +68,6 @@ struct GameResponse: Decodable {
 struct Configuration: Equatable, Decodable, Serializable {
     let isValid: Bool
     let versionNumber: String
-    func serialize(context: AnyRepository<Configuration,Configuration>) -> [Configuration] {
-        return [self]
-    }
 }
 
 @objc(Game)
