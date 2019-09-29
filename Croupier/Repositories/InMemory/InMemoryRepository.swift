@@ -1,6 +1,6 @@
 import Foundation
 
-public final class InMemoryRepository<Response, Entity>: Repository where Response: Serializable & Decodable, Response.Serialized == Entity {
+public final class InMemoryRepository<Response, Entity>: Repository where Entity: Equatable, Response: Serializable & Decodable, Response.Serialized == Entity {
 
     private let source: Source
     private let responseDecoder: Decoding
