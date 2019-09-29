@@ -1,6 +1,6 @@
 import Foundation
 
-public final class InMemoryRepository<Response, Entity>: Repository where Response: Serializable & Decodable & Equatable, Response.Serialized == Entity {
+public final class InMemoryRepository<Response, Entity>: Repository where Response: Serializable & Decodable, Response.Serialized == Entity {
 
     private let source: Source
     private let responseDecoder: Decoding
@@ -18,7 +18,7 @@ public final class InMemoryRepository<Response, Entity>: Repository where Respon
                 let result = data.flatMap({ (data) -> Result<Changes<Entity>,Error> in
                     do {
                         let response = try self.responseDecoder.decode(Response.self, from: data)
-                        _ = response.serialize()
+                        let items = response.serialize(context: self)
                         // Could potentially use the collection diffing API in Swift 5.1?
                         // Array(map.values).difference(from: result)
                         // What key do we use to store each entity as?

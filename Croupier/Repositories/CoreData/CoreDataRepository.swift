@@ -7,7 +7,7 @@ public extension RepositoryError {
     }
 }
 
-public class CoreDataRepository<Response,Entity>: Repository where Response: Serializable, Response: Decodable, Response.Serialized == Entity, Response.Context == NSManagedObjectContext, Entity: NSManagedObject {
+public class CoreDataRepository<Response,Entity>: Repository where Response: Serializable & Decodable, Response.Serialized == Entity, Response.Context == NSManagedObjectContext, Entity: NSManagedObject {
     private let context: NSManagedObjectContext
     private let source: Source
     private let responseDecoder: Decoding
