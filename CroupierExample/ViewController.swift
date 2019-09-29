@@ -51,12 +51,16 @@ struct GamesResponse: Decodable {
 }
 
 extension GamesResponse: Serializable {
-    func serialize(context: NSManagedObjectContext) -> [Game] {
-        return games.compactMap({ (gameResponse) -> Game? in
-            guard let game =  NSEntityDescription.insertNewObject(forEntityName: "Game", into: context) as? Game else { return nil }
-            game.update(gameResponse)
-            return game
-        })
+    func serialize(forKey key: String,
+                   context: NSManagedObjectContext?,
+                   store: (String, Game) -> Void) {
+        guard let context = context else { return }
+        games.forEach { (response) in
+            if let game = NSEntityDescription.insertNewObject(forEntityName: "Game", into: context) as? Game {
+                game.update(response)
+                store(game.identifier, game)
+            }
+        }
     }
 }
 

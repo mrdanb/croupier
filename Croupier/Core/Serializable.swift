@@ -3,11 +3,13 @@ import Foundation
 public protocol Serializable {
     associatedtype Serialized
     associatedtype Context
-    func serialize(context: Context) -> [Serialized]
+    func serialize(forKey key: String, context: Context?, store: (String, Serialized) -> Void)
 }
 
 public extension Serializable {
-    func serialize(context: Any) -> [Self] {
-        return [self]
+    func serialize(forKey key: String,
+                   context: Any?,
+                   store: (String, Self) -> Void) {
+        store(key, self)
     }
 }

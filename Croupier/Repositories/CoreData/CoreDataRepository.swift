@@ -80,12 +80,15 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
         }
     }
 
-    private func serialize(data: Data) throws -> [Entity] {
+    private func serialize(data: Data, forKey key: String) throws -> [Entity] {
         let response = try self.responseDecoder.decode(Response.self, from: data)
         let entities = try self.context.createBackgroundContext().sync({ (context) -> [Entity] in
-            let result = response.serialize(context: context)
+            var items = [Entity]()
+            response.serialize(forKey: key, context: context, store: { (_, entity) in
+                items.append(entity)
+            })
             try context.saveIfNeeded()
-            return result
+            return items
         })
         return entities
     }
@@ -97,7 +100,7 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
             DispatchQueue(label: "uk.co.dollop.decode.queue").async {
                 let result = result.flatMap({ (data) -> Result<[Entity], Error> in
                     do {
-                        let entities = try self.serialize(data: data)
+                        let entities = try self.serialize(data: data, forKey: key)
                         return .success(entities)
                     } catch {
                         return .failure(error)

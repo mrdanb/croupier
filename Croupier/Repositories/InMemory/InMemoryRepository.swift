@@ -18,7 +18,11 @@ public final class InMemoryRepository<Response, Entity>: Repository where Respon
                 let result = data.flatMap({ (data) -> Result<Changes<Entity>,Error> in
                     do {
                         let response = try self.responseDecoder.decode(Response.self, from: data)
-                        let items = response.serialize(context: self)
+                        var items = [Entity]()
+                        response.serialize(forKey: key, context: nil, store: { (identifier, entity) in
+                            self.map[identifier] = entity
+                            items.append(entity)
+                        })
                         // Could potentially use the collection diffing API in Swift 5.1?
                         // Array(map.values).difference(from: result)
                         // What key do we use to store each entity as?
