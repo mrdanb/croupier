@@ -1,5 +1,4 @@
 import Foundation
-import CoreData
 
 public protocol Serializable {
     associatedtype Serialized
