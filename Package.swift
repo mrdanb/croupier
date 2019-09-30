@@ -4,13 +4,15 @@ import PackageDescription
 let package = Package(
     name: "Croupier",
     platforms: [
-        .iOS(.v11),
+        .iOS(.v11)
     ],
-//    products: [
-//        .library(name: "MyLibrary", targets: ["MyLibrary"]),
-//    ],
+    products: [
+        .library(
+            name: "Croupier",
+            targets: ["Croupier"]),
+    ],
     targets: [
-        .target(name: "Croupier"),
-//        .testTarget(name: "MyLibraryTests", dependencies: ["MyLibrary"]),
+        .target(name: "Croupier", dependencies: [], path: "Croupier"),
+//        .testTarget(name: "CroupierTests", dependencies: ["Croupier"]),
     ]
 )

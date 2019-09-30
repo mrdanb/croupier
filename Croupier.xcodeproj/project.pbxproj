@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		01201C5B2341798600040894 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01201C5A2341798600040894 /* Package.swift */; };
 		016030C72339828A00C37C96 /* AnyRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 016030C62339828A00C37C96 /* AnyRepository.swift */; };
 		01BCB1DA233ACB7600714F1D /* JSONDecodableDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01BCB1D9233ACB7600714F1D /* JSONDecodableDecoder.swift */; };
 		01DC2453232C145000F9B56E /* Croupier.h in Headers */ = {isa = PBXBuildFile; fileRef = 01DC2451232C145000F9B56E /* Croupier.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -42,7 +41,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		01201C5A2341798600040894 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		016030C62339828A00C37C96 /* AnyRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyRepository.swift; sourceTree = "<group>"; };
 		01BCB1D9233ACB7600714F1D /* JSONDecodableDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONDecodableDecoder.swift; sourceTree = "<group>"; };
 		01DC244E232C145000F9B56E /* Croupier.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Croupier.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -109,7 +107,8 @@
 			isa = PBXGroup;
 			children = (
 				01DC24B32331869800F9B56E /* README.md */,
-				01201C5A2341798600040894 /* Package.swift */,
+				01DC2451232C145000F9B56E /* Croupier.h */,
+				01DC2452232C145000F9B56E /* Info.plist */,
 				01DC2450232C145000F9B56E /* Croupier */,
 				01DC2478232C1A0600F9B56E /* CroupierExample */,
 				01DC244F232C145000F9B56E /* Products */,
@@ -135,8 +134,6 @@
 				01DC24A923317F0E00F9B56E /* Repositories */,
 				01DC248E232C1B0B00F9B56E /* Decoders */,
 				01DC2459232C147000F9B56E /* Core */,
-				01DC2451232C145000F9B56E /* Croupier.h */,
-				01DC2452232C145000F9B56E /* Info.plist */,
 			);
 			path = Croupier;
 			sourceTree = "<group>";
@@ -368,7 +365,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				01201C5B2341798600040894 /* Package.swift in Sources */,
 				01DC2482232C1A0700F9B56E /* CroupierExample.xcdatamodeld in Sources */,
 				01DC247C232C1A0600F9B56E /* ViewController.swift in Sources */,
 				01DC247A232C1A0600F9B56E /* AppDelegate.swift in Sources */,
@@ -538,7 +534,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = Croupier/Info.plist;
+				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -566,7 +562,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = Croupier/Info.plist;
+				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
