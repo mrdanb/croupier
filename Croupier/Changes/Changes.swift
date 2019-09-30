@@ -35,7 +35,27 @@ public struct Changes<Entity> {
     }
 }
 
-public  extension Changes {
+extension Changes {
+
+    @available(iOS 13, *)
+    init(_ diff: CollectionDifference<Entity>) {
+        for change in diff {
+            switch change {
+            case .insert(_, let element, _):
+                inserted(element)
+            case .remove(_, let element, _):
+                deleted(element)
+            }
+        }
+    }
+
+    init<C>(deleted: C, inserted: C) where C: Collection, C.Element == Entity {
+        self.deleted = Array(deleted)
+        self.inserted = Array(inserted)
+    }
+}
+
+public extension Changes {
     enum ChangeType {
         case inserted
         case deleted

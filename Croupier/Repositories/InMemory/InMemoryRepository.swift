@@ -1,6 +1,6 @@
 import Foundation
 
-public final class InMemoryRepository<Response, Entity>: Repository where Response: Serializable & Decodable, Response.Serialized == Entity {
+public final class InMemoryRepository<Response, Entity>: Repository where Entity: Equatable, Response: Serializable & Decodable, Response.Serialized == Entity {
 
     private let source: Source
     private let responseDecoder: Decoding
@@ -23,16 +23,25 @@ public final class InMemoryRepository<Response, Entity>: Repository where Respon
                             self.map[identifier] = entity
                             items.append(entity)
                         })
-                        // Could potentially use the collection diffing API in Swift 5.1?
-                        // Array(map.values).difference(from: result)
-                        // What key do we use to store each entity as?
-                        return .success(Changes<Entity>())
+                        let changes = self.createDiff(previous: Array(self.map.values), new: items)
+                        return .success(changes)
                     } catch {
                         return .failure(error)
                     }
                 })
                 DispatchQueue.main.async { completion(result) }
             }
+        }
+    }
+
+    private func createDiff(previous: [Entity], new: [Entity]) -> Changes<Entity> {
+        if #available(iOS 13, *) {
+            let diff = new.difference(from: previous)
+            return Changes<Entity>(diff)
+        } else {
+            let removed = previous.filter{ !new.contains($0) }
+            let inserted = new.filter{ !previous.contains($0) }
+            return Changes<Entity>(deleted: removed, inserted: inserted)
         }
     }
 
