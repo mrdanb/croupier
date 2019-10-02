@@ -21,7 +21,7 @@ public struct AnyRepository<Response,Entity>: Repository where Response: Seriali
         _getAll(completion)
     }
 
-    public func sync(key: String, completion: @escaping (Result<Changes<Entity>, Error>) -> Void) {
+    public func sync(from key: String, completion: @escaping (Result<Changes<Entity>, Error>) -> Void) {
         _sync(key, completion)
     }
 

@@ -93,14 +93,14 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
         return entities
     }
 
-    public func sync(key: String,
+    public func sync(from path: String,
                      completion: @escaping (Result<Changes<Entity>,Error>) -> Void) {
         changes.empty()
-        source.data(for: key, parameters: nil) { (result) in
+        source.data(for: path, parameters: nil) { (result) in
             DispatchQueue(label: "uk.co.dollop.decode.queue").async {
                 let result = result.flatMap({ (data) -> Result<[Entity], Error> in
                     do {
-                        let entities = try self.serialize(data: data, forKey: key)
+                        let entities = try self.serialize(data: data, forKey: path)
                         return .success(entities)
                     } catch {
                         return .failure(error)

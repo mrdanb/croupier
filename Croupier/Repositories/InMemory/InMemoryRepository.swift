@@ -12,14 +12,14 @@ public final class InMemoryRepository<Response, Entity>: Repository where Entity
         self.responseDecoder = responseDecoder
     }
 
-    public func sync(key: String, completion: @escaping (Result<Changes<Entity>,Error>) -> Void) {
-        source.data(for: key, parameters: nil) { (data) in
+    public func sync(from path: String, completion: @escaping (Result<Changes<Entity>,Error>) -> Void) {
+        source.data(for: path, parameters: nil) { (data) in
             DispatchQueue(label: "uk.co.dollop.decode.queue").async {
                 let result = data.flatMap({ (data) -> Result<Changes<Entity>,Error> in
                     do {
                         let response = try self.responseDecoder.decode(Response.self, from: data)
                         var items = [Entity]()
-                        response.serialize(forKey: key, context: nil, store: { (identifier, entity) in
+                        response.serialize(forKey: path, context: nil, store: { (identifier, entity) in
                             self.map[identifier] = entity
                             items.append(entity)
                         })
