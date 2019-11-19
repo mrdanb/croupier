@@ -35,7 +35,7 @@ class ViewController: UIViewController {
          This is the name of the property that will be used to match the key against when fetching entities.
          */
         let repository = CoreDataRepository<GamesResponse, Game>(source: source, context: context, identifier: "identifier")
-        repository.sync(key: "5d8beb5d350000f745d472a1") { (result) in
+        repository.sync(from: "5d8beb5d350000f745d472a1") { (result) in
             switch result {
             case .success(let changes):
                 print(changes)

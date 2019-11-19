@@ -60,7 +60,7 @@ repository.getAll { (result) in
 ```swift
 let repository: AnyRepository<Response, User> = …
 
-repository.sync(key: "/users/example-identifier") { (result) in
+repository.sync(from: "/users/example-identifier") { (result) in
     switch result {
     case .success(let changes): // Handle changes - represented by type `Changes<User>`
     case .failure(let error): // Handle error

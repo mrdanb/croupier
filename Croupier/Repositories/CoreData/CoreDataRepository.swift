@@ -7,26 +7,31 @@ public extension RepositoryError {
     }
 }
 
+public protocol ContextProvider {
+    var mainContext: NSManagedObjectContext { get }
+    func newBackgroundContext() -> NSManagedObjectContext
+}
+
 public class CoreDataRepository<Response,Entity>: Repository where Response: Serializable & Decodable, Response.Serialized == Entity, Response.Context == NSManagedObjectContext, Entity: NSManagedObject {
-    private let context: NSManagedObjectContext
+    private let contextProvider: ContextProvider
     private let source: Source
     private let responseDecoder: Decoding
     private let identifier: String
     private lazy var changes = Changes<Entity>()
 
     public init(source: Source,
+                contextProvider: ContextProvider,
                 responseDecoder: Decoding = JSONDecodableDecoder(),
-                context: NSManagedObjectContext,
                 identifier: String) {
-        self.context = context
         self.source = source
+        self.contextProvider = contextProvider
         self.responseDecoder = responseDecoder
         self.identifier = identifier
 
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(objectsDidChange),
                                                name: .NSManagedObjectContextObjectsDidChange,
-                                               object: context)
+                                               object: contextProvider.mainContext)
     }
 
     @objc func objectsDidChange(notification: NSNotification) {
@@ -51,9 +56,9 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
     public func get(forKey key: String, completion: @escaping (Result<Entity, Error>) -> Void) {
         let request = createRequest()
         request.predicate = NSPredicate(format: "%K = %@", identifier, key)
-        context.perform {
+        contextProvider.mainContext.perform {
             do {
-                guard let result = try self.context.fetch(request).first else {
+                guard let result = try self.contextProvider.mainContext.fetch(request).first else {
                     completion(.failure(RepositoryError.CoreData.objectNotFoundInContext))
                     return
                 }
@@ -66,9 +71,9 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
 
     public func getAll(completion: @escaping (Result<[Entity], Error>) -> Void) {
         let request = createRequest()
-        context.perform {
+        contextProvider.mainContext.perform {
             do {
-                let result = try self.context.fetch(request)
+                let result = try self.contextProvider.mainContext.fetch(request)
                 guard result.count > 0 else {
                     completion(.failure(RepositoryError.CoreData.objectNotFoundInContext))
                     return
@@ -82,7 +87,7 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
 
     private func serialize(data: Data, forKey key: String) throws -> [Entity] {
         let response = try self.responseDecoder.decode(Response.self, from: data)
-        let entities = try self.context.createBackgroundContext().sync({ (context) -> [Entity] in
+        let entities = try contextProvider.newBackgroundContext().sync({ (context) -> [Entity] in
             var items = [Entity]()
             response.serialize(forKey: key, context: context, store: { (_, entity) in
                 items.append(entity)
@@ -110,7 +115,7 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
                     completion(
                         result.flatMap({ (_) -> Result<Changes<Entity>, Error> in
                             do {
-                                try self.context.saveIfNeeded()
+                                try self.contextProvider.mainContext.saveIfNeeded()
                                 return .success(self.changes)
                             } catch {
                                 return .failure(error)
@@ -123,10 +128,10 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
     }
 
     public func delete(item: Entity, completion: @escaping (Result<Entity, Error>) -> Void) {
-        context.perform {
-            self.context.delete(item)
+        contextProvider.mainContext.perform {
+            self.contextProvider.mainContext.delete(item)
             do {
-                try self.context.saveIfNeeded()
+                try self.contextProvider.mainContext.saveIfNeeded()
                 completion(.success(item))
             } catch {
                 completion(.failure(error))
@@ -141,15 +146,7 @@ extension NSManagedObjectContext {
         try save()
     }
 
-    func createBackgroundContext() -> NSManagedObjectContext {
-        let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        context.undoManager = nil
-        context.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
-        context.parent = self
-        return context
-    }
-
-    // Check if we still need to do this with xcode 11
+    // This isn't nice but we because performAndWait doesn't rethrow then we need to dot it...
     func sync<T>(_ task: (NSManagedObjectContext) throws -> T) throws -> T {
         var result: Result<T,Error>? = nil
         performAndWait {
