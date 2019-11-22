@@ -81,7 +81,9 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
 
     private func serialize(data: Data, forKey key: String) throws -> [Entity] {
         let response = try self.responseDecoder.decode(Response.self, from: data)
-        let entities = try contextProvider.newBackgroundContext().sync({ (context) -> [Entity] in
+        let backgroundContext = contextProvider.newBackgroundContext()
+        backgroundContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
+        let entities = try backgroundContext.sync({ (context) -> [Entity] in
             var items = [Entity]()
             response.serialize(context: context, store: { entity in
                 items.append(entity)
