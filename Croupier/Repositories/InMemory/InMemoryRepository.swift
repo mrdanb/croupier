@@ -4,7 +4,7 @@ public final class InMemoryRepository<Response, Entity>: Repository where Entity
 
     private let source: Source
     private let responseDecoder: Decoding
-    private lazy var map = [String: Entity]()
+    private lazy var store = [Entity]()
 
     public init(source: Source,
                 responseDecoder: Decoding = JSONDecodableDecoder()) {
@@ -19,11 +19,11 @@ public final class InMemoryRepository<Response, Entity>: Repository where Entity
                     do {
                         let response = try self.responseDecoder.decode(Response.self, from: data)
                         var items = [Entity]()
-                        response.serialize(forKey: path, context: nil, store: { (identifier, entity) in
-                            self.map[identifier] = entity
+                        response.serialize(context: nil, store: { entity in
+                            self.store.append(entity)
                             items.append(entity)
                         })
-                        let changes = self.createDiff(previous: Array(self.map.values), new: items)
+                        let changes = self.createDiff(previous: self.store, new: items)
                         return .success(changes)
                     } catch {
                         return .failure(error)
@@ -35,31 +35,21 @@ public final class InMemoryRepository<Response, Entity>: Repository where Entity
     }
 
     private func createDiff(previous: [Entity], new: [Entity]) -> Changes<Entity> {
-        if #available(iOS 13, *) {
-            let diff = new.difference(from: previous)
-            return Changes<Entity>(diff)
-        } else {
-            let removed = previous.filter{ !new.contains($0) }
-            let inserted = new.filter{ !previous.contains($0) }
-            return Changes<Entity>(deleted: removed, inserted: inserted)
-        }
+        let diff = new.difference(from: previous)
+        return Changes<Entity>(diff)
     }
 
-    public func get(forKey key: String, completion: @escaping (Result<Entity, Error>) -> Void) {
-        guard let item = map[key] else {
-            completion(.failure(RepositoryError.notFound))
-            return
-        }
-        completion(.success(item))
+    public func get(predicate: NSPredicate, completion: @escaping (Result<[Entity], Error>) -> Void) {
+        let result = self.store.filter{ predicate.evaluate(with: $0) }
+        completion(.success(result))
     }
 
     public func getAll(completion: @escaping (Result<[Entity], Error>) -> Void) {
-        let all = Array(map.values)
-        completion(.success(all))
+        completion(.success(store))
     }
 
     public func delete(item: Entity, completion: @escaping (Result<Entity, Error>) -> Void) {
-        map.values.forEach { (entity) in
+        store.forEach { (entity) in
             // Equatable?
         }
     }

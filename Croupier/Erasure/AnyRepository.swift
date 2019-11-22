@@ -2,7 +2,7 @@ import Foundation
 
 public struct AnyRepository<Response,Entity>: Repository where Response: Serializable {
 
-    private let _get: (String, @escaping (Result<Entity,Error>) -> Void) -> Void
+    private let _get: (NSPredicate, @escaping (Result<[Entity],Error>) -> Void) -> Void
     private let _getAll: (@escaping (Result<[Entity],Error>) -> Void) -> Void
     private let _sync: (String, @escaping (Result<Changes<Entity>,Error>) -> Void) -> Void
     private let _delete: (Entity, @escaping (Result<Entity,Error>) -> Void) -> Void
@@ -13,8 +13,8 @@ public struct AnyRepository<Response,Entity>: Repository where Response: Seriali
         _delete = repository.delete
     }
 
-    public func get(forKey key: String, completion: @escaping (Result<Entity, Error>) -> Void) {
-        _get(key, completion)
+    public func get(predicate: NSPredicate, completion: @escaping (Result<[Entity], Error>) -> Void) {
+        _get(predicate, completion)
     }
 
     public func getAll(completion: @escaping (Result<[Entity], Error>) -> Void) {

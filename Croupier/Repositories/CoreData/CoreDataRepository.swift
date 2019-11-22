@@ -16,17 +16,14 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
     private let contextProvider: ContextProvider
     private let source: Source
     private let responseDecoder: Decoding
-    private let identifier: String
     private lazy var changes = Changes<Entity>()
 
     public init(source: Source,
                 contextProvider: ContextProvider,
-                responseDecoder: Decoding = JSONDecodableDecoder(),
-                identifier: String) {
+                responseDecoder: Decoding = JSONDecodableDecoder()) {
         self.source = source
         self.contextProvider = contextProvider
         self.responseDecoder = responseDecoder
-        self.identifier = identifier
 
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(objectsDidChange),
@@ -53,15 +50,12 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
         return NSFetchRequest(entityName: Entity.entity().name ?? String(describing: Entity.self))
     }
 
-    public func get(forKey key: String, completion: @escaping (Result<Entity, Error>) -> Void) {
+    public func get(predicate: NSPredicate, completion: @escaping (Result<[Entity], Error>) -> Void) {
         let request = createRequest()
-        request.predicate = NSPredicate(format: "%K = %@", identifier, key)
+        request.predicate = predicate
         contextProvider.mainContext.perform {
             do {
-                guard let result = try self.contextProvider.mainContext.fetch(request).first else {
-                    completion(.failure(RepositoryError.CoreData.objectNotFoundInContext))
-                    return
-                }
+                let result = try self.contextProvider.mainContext.fetch(request)
                 completion(.success(result))
             } catch {
                 completion(.failure(error))
@@ -89,7 +83,7 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
         let response = try self.responseDecoder.decode(Response.self, from: data)
         let entities = try contextProvider.newBackgroundContext().sync({ (context) -> [Entity] in
             var items = [Entity]()
-            response.serialize(forKey: key, context: context, store: { (_, entity) in
+            response.serialize(context: context, store: { entity in
                 items.append(entity)
             })
             try context.saveIfNeeded()
@@ -162,6 +156,6 @@ extension NSManagedObjectContext {
 extension CoreDataRepository: CustomDebugStringConvertible {
     public var debugDescription: String {
         let address = Unmanaged<AnyObject>.passUnretained(self as AnyObject).toOpaque()
-        return "<CoreDataRepository: \(address)> (primaryKey: \"\(identifier)\", source: \(source), decoder: \(responseDecoder))"
+        return "<CoreDataRepository: \(address)> (source: \(source), decoder: \(responseDecoder))"
     }
 }

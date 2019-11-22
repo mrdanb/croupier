@@ -34,7 +34,9 @@ class ViewController: UIViewController {
          As well as the source and context you will need to set the identifier for the repository.
          This is the name of the property that will be used to match the key against when fetching entities.
          */
-        let repository = CoreDataRepository<GamesResponse, Game>(source: source, context: context, identifier: "identifier")
+        let repository = CoreDataRepository<GamesResponse, Game>(source: source,
+                                                                 contextProvider: persistentContainer,
+                                                                 identifier: "identifier")
         repository.sync(from: "5d8beb5d350000f745d472a1") { (result) in
             switch result {
             case .success(let changes):
@@ -46,19 +48,24 @@ class ViewController: UIViewController {
     }
 }
 
+extension NSPersistentContainer: ContextProvider {
+    public var mainContext: NSManagedObjectContext {
+        return viewContext
+    }
+}
+
 struct GamesResponse: Decodable {
     let games: [GameResponse]
 }
 
 extension GamesResponse: Serializable {
-    func serialize(forKey key: String,
-                   context: NSManagedObjectContext?,
-                   store: (String, Game) -> Void) {
+    func serialize(context: NSManagedObjectContext?,
+                   store: (Game) -> Void) {
         guard let context = context else { return }
         games.forEach { (response) in
             if let game = NSEntityDescription.insertNewObject(forEntityName: "Game", into: context) as? Game {
                 game.update(response)
-                store(game.identifier, game)
+                store(game)
             }
         }
     }
