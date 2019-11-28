@@ -13,6 +13,17 @@ public protocol Fetching {
 }
 
 public extension Fetching {
+    func getFirstAndWait(predicate: NSPredicate? = nil) throws -> Entity {
+        let results: [Entity]
+        if let filter = predicate {
+            results = try getAndWait(predicate: filter)
+        } else {
+            results = try getAllAndWait()
+        }
+        guard let item = results.first else { throw RepositoryError.notFound }
+        return item
+    }
+
     func getFirst(predicate: NSPredicate? = nil,
                   completion: @escaping (Result<Entity, Error>) -> Void) {
         let handler = { (result: Result<[Entity],Error>) in

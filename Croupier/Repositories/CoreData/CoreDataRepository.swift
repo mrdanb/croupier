@@ -90,13 +90,13 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
     public func getAllAndWait() throws -> [Entity] {
         let request = createRequest()
         return try contextProvider.mainContext.sync { context -> [Entity] in
-            let result = try self.contextProvider.mainContext.fetch(request)
+            let result = try context.fetch(request)
             guard result.count > 0 else { throw RepositoryError.CoreData.objectNotFoundInContext }
             return result
         }
     }
 
-    private func serialize(data: Data, forKey key: String) throws -> [Entity] {
+    private func serialize(data: Data) throws -> [Entity] {
         let response = try self.responseDecoder.decode(Response.self, from: data)
         let backgroundContext = contextProvider.newBackgroundContext()
         backgroundContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
@@ -114,11 +114,11 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
     public func sync(from path: String,
                      completion: @escaping (Result<Changes<Entity>,Error>) -> Void) {
         changes.empty()
-        source.data(for: path, parameters: nil) { (result) in
+        source.data(for: path, parameters: nil) { result in
             DispatchQueue(label: "uk.co.dollop.decode.queue").async {
                 let result = result.flatMap({ (data) -> Result<[Entity], Error> in
                     do {
-                        let entities = try self.serialize(data: data, forKey: path)
+                        let entities = try self.serialize(data: data)
                         return .success(entities)
                     } catch {
                         return .failure(error)
@@ -166,14 +166,33 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
             do {
                 let result = try mainContext.fetch(request)
                 let count = result.count
-                result.forEach { id in
-                    mainContext.delete(mainContext.object(with: id))
-                }
+                result.forEach { mainContext.delete(mainContext.object(with: $0)) }
                 try mainContext.saveIfNeeded()
                 completion(.success(count))
             } catch {
                 completion(.failure(error))
             }
+        }
+    }
+
+    public func deleteAndWait(item: Entity) throws -> Entity {
+        return try contextProvider.mainContext.sync { context -> Entity in
+            context.delete(item)
+            try context.saveIfNeeded()
+            return item
+        }
+    }
+
+    public func deleteAllAndWait() throws -> Int {
+        let request = NSFetchRequest<NSManagedObjectID>(entityName: Entity.entity().name ?? String(describing: Entity.self))
+        request.resultType = .managedObjectIDResultType
+
+        return try contextProvider.mainContext.sync { context -> Int in
+            let result = try context.fetch(request)
+            let count = result.count
+            result.forEach { context.delete(context.object(with: $0)) }
+            try context.saveIfNeeded()
+            return count
         }
     }
 }

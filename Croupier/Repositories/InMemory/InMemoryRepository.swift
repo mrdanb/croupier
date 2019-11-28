@@ -65,4 +65,15 @@ public final class InMemoryRepository<Response, Entity>: Repository where Entity
         store = []
         completion(.success(count))
     }
+
+    public func deleteAndWait(item: Entity) throws -> Entity {
+        store.removeAll(where: { $0 == item })
+        return item
+    }
+
+    public func deleteAllAndWait() throws -> Int {
+        let count = store.count
+        store = []
+        return count
+    }
 }
