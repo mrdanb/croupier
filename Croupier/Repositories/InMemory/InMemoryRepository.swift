@@ -53,4 +53,10 @@ public final class InMemoryRepository<Response, Entity>: Repository where Entity
             // Equatable?
         }
     }
+
+    public func deleteAll(completion: @escaping (Result<Int, Error>) -> Void) {
+        let count = store.count
+        store = []
+        completion(.success(count))
+    }
 }

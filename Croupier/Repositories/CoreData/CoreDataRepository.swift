@@ -134,6 +134,27 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
             }
         }
     }
+
+    public func deleteAll(completion: @escaping (Result<Int, Error>) -> Void) {
+        let request = NSFetchRequest<NSManagedObjectID>(entityName: Entity.entity().name ?? String(describing: Entity.self))
+        request.resultType = .managedObjectIDResultType
+
+        let mainContext = contextProvider.mainContext
+
+        mainContext.perform {
+            do {
+                let result = try mainContext.fetch(request)
+                let count = result.count
+                result.forEach { id in
+                    mainContext.delete(mainContext.object(with: id))
+                }
+                try mainContext.saveIfNeeded()
+                completion(.success(count))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
 }
 
 extension NSManagedObjectContext {

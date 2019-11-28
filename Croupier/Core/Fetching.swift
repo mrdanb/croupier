@@ -9,9 +9,9 @@ public protocol Fetching {
 }
 
 public extension Fetching {
-    func getFirst(predicate: NSPredicate,
+    func getFirst(predicate: NSPredicate? = nil,
                   completion: @escaping (Result<Entity, Error>) -> Void) {
-        get(predicate: predicate) { result in
+        let handler = { (result: Result<[Entity],Error>) in
             completion(
                 result.flatMap { items -> Result<Entity, Error> in
                     guard let item = items.first else {
@@ -20,6 +20,11 @@ public extension Fetching {
                     return .success(item)
                 }
             )
+        }
+        if let filter = predicate {
+            get(predicate: filter, completion: handler)
+        } else {
+            getAll(completion: handler)
         }
     }
 }
