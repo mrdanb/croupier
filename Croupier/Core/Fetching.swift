@@ -6,6 +6,10 @@ public protocol Fetching {
              completion: @escaping (Result<[Entity], Error>) -> Void)
 
     func getAll(completion: @escaping (Result<[Entity], Error>) -> Void)
+
+    func getAndWait(predicate: NSPredicate) throws -> [Entity]
+
+    func getAllAndWait() throws -> [Entity]
 }
 
 public extension Fetching {

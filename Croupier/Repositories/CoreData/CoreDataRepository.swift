@@ -79,6 +79,23 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
         }
     }
 
+    public func getAndWait(predicate: NSPredicate) throws -> [Entity] {
+        let request = createRequest()
+        request.predicate = predicate
+        return try contextProvider.mainContext.sync { context -> [Entity] in
+            return try context.fetch(request)
+        }
+    }
+
+    public func getAllAndWait() throws -> [Entity] {
+        let request = createRequest()
+        return try contextProvider.mainContext.sync { context -> [Entity] in
+            let result = try self.contextProvider.mainContext.fetch(request)
+            guard result.count > 0 else { throw RepositoryError.CoreData.objectNotFoundInContext }
+            return result
+        }
+    }
+
     private func serialize(data: Data, forKey key: String) throws -> [Entity] {
         let response = try self.responseDecoder.decode(Response.self, from: data)
         let backgroundContext = contextProvider.newBackgroundContext()
@@ -136,6 +153,10 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
     }
 
     public func deleteAll(completion: @escaping (Result<Int, Error>) -> Void) {
+
+        // Rather than perform a `NSBatchDeleteRequest` we delete entities individually
+        // Apparently `NSBatchDeleteRequest` doesn't handle relationship rules.
+        // Am yet to check this theory however.
         let request = NSFetchRequest<NSManagedObjectID>(entityName: Entity.entity().name ?? String(describing: Entity.self))
         request.resultType = .managedObjectIDResultType
 

@@ -37,7 +37,6 @@ public struct Changes<Entity> {
 
 extension Changes {
 
-    @available(iOS 13, *)
     init(_ diff: CollectionDifference<Entity>) {
         for change in diff {
             switch change {

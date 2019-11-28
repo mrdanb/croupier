@@ -18,12 +18,11 @@ public final class InMemoryRepository<Response, Entity>: Repository where Entity
                 let result = data.flatMap({ (data) -> Result<Changes<Entity>,Error> in
                     do {
                         let response = try self.responseDecoder.decode(Response.self, from: data)
-                        var items = [Entity]()
+                        let snapshot = self.store
                         response.serialize(context: nil, store: { entity in
                             self.store.append(entity)
-                            items.append(entity)
                         })
-                        let changes = self.createDiff(previous: self.store, new: items)
+                        let changes = self.createDiff(previous: snapshot, new: self.store)
                         return .success(changes)
                     } catch {
                         return .failure(error)
@@ -48,10 +47,17 @@ public final class InMemoryRepository<Response, Entity>: Repository where Entity
         completion(.success(store))
     }
 
+    public func getAndWait(predicate: NSPredicate) throws -> [Entity] {
+        return store.filter{ predicate.evaluate(with: $0) }
+    }
+
+    public func getAllAndWait() throws -> [Entity] {
+        return store
+    }
+
     public func delete(item: Entity, completion: @escaping (Result<Entity, Error>) -> Void) {
-        store.forEach { (entity) in
-            // Equatable?
-        }
+        store.removeAll(where: { $0 == item })
+        completion(.success(item))
     }
 
     public func deleteAll(completion: @escaping (Result<Int, Error>) -> Void) {
