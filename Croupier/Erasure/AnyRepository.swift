@@ -10,6 +10,8 @@ public struct AnyRepository<Response,Entity>: Repository where Response: Seriali
     private let _deleteAll: (@escaping (Result<Int,Error>) -> Void) -> Void
     private let _deleteAndWait: (Entity) throws -> Entity
     private let _deleteAllAndWait: () throws -> Int
+    private let _add: (Entity, @escaping (Result<Entity,Error>) -> Void) -> Void
+    private let _addAndWait: (Entity) throws -> Entity
 
     public init<Repo>(_ repository: Repo) where Repo: Repository, Repo.Entity == Entity {
         _get = repository.get
@@ -21,6 +23,8 @@ public struct AnyRepository<Response,Entity>: Repository where Response: Seriali
         _deleteAll = repository.deleteAll
         _deleteAndWait = repository.deleteAndWait
         _deleteAllAndWait = repository.deleteAllAndWait
+        _add = repository.add
+        _addAndWait = repository.addAndWait
     }
 
     public func get(predicate: NSPredicate, completion: @escaping (Result<[Entity], Error>) -> Void) {
@@ -57,6 +61,14 @@ public struct AnyRepository<Response,Entity>: Repository where Response: Seriali
 
     public func deleteAllAndWait() throws -> Int {
         return try _deleteAllAndWait()
+    }
+
+    public func add(item: Entity, completion: @escaping (Result<Entity, Error>) -> Void) {
+        _add(item, completion)
+    }
+
+    public func addAndWait(item: Entity) throws -> Entity {
+        return try _addAndWait(item)
     }
 }
 

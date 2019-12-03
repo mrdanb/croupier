@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0124286A2395CB8F00D6961D /* Adding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 012428692395CB8F00D6961D /* Adding.swift */; };
 		016030C72339828A00C37C96 /* AnyRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 016030C62339828A00C37C96 /* AnyRepository.swift */; };
 		01BCB1DA233ACB7600714F1D /* JSONDecodableDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01BCB1D9233ACB7600714F1D /* JSONDecodableDecoder.swift */; };
 		01DC2453232C145000F9B56E /* Croupier.h in Headers */ = {isa = PBXBuildFile; fileRef = 01DC2451232C145000F9B56E /* Croupier.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -41,6 +42,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		012428692395CB8F00D6961D /* Adding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Adding.swift; sourceTree = "<group>"; };
 		016030C62339828A00C37C96 /* AnyRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyRepository.swift; sourceTree = "<group>"; };
 		01BCB1D9233ACB7600714F1D /* JSONDecodableDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONDecodableDecoder.swift; sourceTree = "<group>"; };
 		01DC244E232C145000F9B56E /* Croupier.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Croupier.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -143,6 +145,7 @@
 			children = (
 				01DC245A232C147C00F9B56E /* Repository.swift */,
 				01DC249B23317E0300F9B56E /* Fetching.swift */,
+				012428692395CB8F00D6961D /* Adding.swift */,
 				01DC249F23317E2600F9B56E /* Deleting.swift */,
 				01DC24932330289600F9B56E /* Decoding.swift */,
 				01FE39EA233D58E60065A5B9 /* Syncing.swift */,
@@ -345,6 +348,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				01DC249C23317E0300F9B56E /* Fetching.swift in Sources */,
+				0124286A2395CB8F00D6961D /* Adding.swift in Sources */,
 				01DC245B232C147C00F9B56E /* Repository.swift in Sources */,
 				01DC2465232C152000F9B56E /* InMemoryRepository.swift in Sources */,
 				01DC249A2330304400F9B56E /* Source.swift in Sources */,

@@ -76,4 +76,14 @@ public final class InMemoryRepository<Response, Entity>: Repository where Entity
         store = []
         return count
     }
+
+    public func add(item: Entity, completion: @escaping (Result<Entity, Error>) -> Void) {
+        store.append(item)
+        completion(.success(item))
+    }
+
+    public func addAndWait(item: Entity) throws -> Entity {
+        store.append(item)
+        return item
+    }
 }

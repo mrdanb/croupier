@@ -195,6 +195,33 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
             return count
         }
     }
+
+    public func add(item: Entity, completion: @escaping (Result<Entity, Error>) -> Void) {
+        guard item.managedObjectContext != contextProvider.mainContext else {
+            completion(.success(item))
+            return
+        }
+
+        let description = item.entity
+        let result = Entity(entity: description, insertInto: contextProvider.mainContext)
+        contextProvider.mainContext.perform {
+            do {
+                try self.contextProvider.mainContext.saveIfNeeded()
+                completion(.success(result))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+
+    public func addAndWait(item: Entity) throws -> Entity {
+        let description = item.entity
+        let result = Entity(entity: description, insertInto: contextProvider.mainContext)
+        return try contextProvider.mainContext.sync { context -> Entity in
+            try context.saveIfNeeded()
+            return result
+        }
+    }
 }
 
 extension NSManagedObjectContext {
