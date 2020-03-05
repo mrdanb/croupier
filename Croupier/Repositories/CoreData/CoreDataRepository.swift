@@ -46,16 +46,13 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
         }
     }
 
-    private func createRequest() -> NSFetchRequest<Entity> {
-        return NSFetchRequest(entityName: Entity.entity().name ?? String(describing: Entity.self))
-    }
-
     public func get(predicate: NSPredicate, completion: @escaping (Result<[Entity], Error>) -> Void) {
-        let request = createRequest()
+        let request = createRequest(withResultType: Entity.self)
         request.predicate = predicate
-        contextProvider.mainContext.perform {
+        let mainContext = contextProvider.mainContext
+        mainContext.perform {
             do {
-                let result = try self.contextProvider.mainContext.fetch(request)
+                let result = try mainContext.fetch(request)
                 completion(.success(result))
             } catch {
                 completion(.failure(error))
@@ -64,10 +61,11 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
     }
 
     public func getAll(completion: @escaping (Result<[Entity], Error>) -> Void) {
-        let request = createRequest()
-        contextProvider.mainContext.perform {
+        let request = createRequest(withResultType: Entity.self)
+        let mainContext = contextProvider.mainContext
+        mainContext.perform {
             do {
-                let result = try self.contextProvider.mainContext.fetch(request)
+                let result = try mainContext.fetch(request)
                 guard result.count > 0 else {
                     completion(.failure(RepositoryError.CoreData.objectNotFoundInContext))
                     return
@@ -80,7 +78,7 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
     }
 
     public func getAndWait(predicate: NSPredicate) throws -> [Entity] {
-        let request = createRequest()
+        let request = createRequest(withResultType: Entity.self)
         request.predicate = predicate
         return try contextProvider.mainContext.sync { context -> [Entity] in
             return try context.fetch(request)
@@ -88,7 +86,7 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
     }
 
     public func getAllAndWait() throws -> [Entity] {
-        let request = createRequest()
+        let request = createRequest(withResultType: Entity.self)
         return try contextProvider.mainContext.sync { context -> [Entity] in
             let result = try context.fetch(request)
             guard result.count > 0 else { throw RepositoryError.CoreData.objectNotFoundInContext }
@@ -97,17 +95,17 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
     }
 
     private func serialize(data: Data) throws -> [Entity] {
-        let response = try self.responseDecoder.decode(Response.self, from: data)
+        let response = try responseDecoder.decode(Response.self, from: data)
         let backgroundContext = contextProvider.newBackgroundContext()
         backgroundContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
-        let entities = try backgroundContext.sync({ (context) -> [Entity] in
+        let entities = try backgroundContext.sync { context -> [Entity] in
             var items = [Entity]()
-            response.serialize(context: context, store: { entity in
+            response.serialize(context: context) { entity in
                 items.append(entity)
-            })
+            }
             try context.saveIfNeeded()
             return items
-        })
+        }
         return entities
     }
 
@@ -115,36 +113,40 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
                      completion: @escaping (Result<Changes<Entity>,Error>) -> Void) {
         changes.empty()
         source.data(for: path, parameters: nil) { result in
-            DispatchQueue(label: "uk.co.dollop.decode.queue").async {
-                let result = result.flatMap({ (data) -> Result<[Entity], Error> in
+            DispatchQueue(label: "uk.co.dollop.decode.queue").async { [weak self] in
+                guard let `self` = self else { return }
+                let result = result.flatMap { data -> Result<[Entity], Error> in
                     do {
                         let entities = try self.serialize(data: data)
                         return .success(entities)
                     } catch {
                         return .failure(error)
                     }
-                })
+                }
                 DispatchQueue.main.async {
-                    completion(
-                        result.flatMap({ (_) -> Result<Changes<Entity>, Error> in
-                            do {
-                                try self.contextProvider.mainContext.saveIfNeeded()
-                                return .success(self.changes)
-                            } catch {
-                                return .failure(error)
-                            }
-                        })
-                    )
+                    completion(self.mainContextSaveResult(from: result))
                 }
             }
         }
     }
 
-    public func delete(item: Entity, completion: @escaping (Result<Entity, Error>) -> Void) {
-        contextProvider.mainContext.perform {
-            self.contextProvider.mainContext.delete(item)
+    private func mainContextSaveResult(from result:  Result<[Entity], Error>) -> Result<Changes<Entity>, Error> {
+        result.flatMap { _ -> Result<Changes<Entity>, Error> in
             do {
                 try self.contextProvider.mainContext.saveIfNeeded()
+                return .success(self.changes)
+            } catch {
+                return .failure(error)
+            }
+        }
+    }
+
+    public func delete(item: Entity, completion: @escaping (Result<Entity, Error>) -> Void) {
+        let mainContext = contextProvider.mainContext
+        mainContext.perform {
+            mainContext.delete(item)
+            do {
+                try mainContext.saveIfNeeded()
                 completion(.success(item))
             } catch {
                 completion(.failure(error))
@@ -153,11 +155,10 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
     }
 
     public func deleteAll(completion: @escaping (Result<Int, Error>) -> Void) {
-
-        // Rather than perform a `NSBatchDeleteRequest` we delete entities individually
-        // Apparently `NSBatchDeleteRequest` doesn't handle relationship rules.
-        // Am yet to check this theory however.
-        let request = NSFetchRequest<NSManagedObjectID>(entityName: Entity.entity().name ?? String(describing: Entity.self))
+        // Rather than perform a `NSBatchDeleteRequest` we just delete entities individually
+        // I have read that apparently `NSBatchDeleteRequest` does not handle relationship rules very well.
+        // Am yet to check this theory however :s
+        let request = createRequest(withResultType: NSManagedObjectID.self)
         request.resultType = .managedObjectIDResultType
 
         let mainContext = contextProvider.mainContext
@@ -184,7 +185,7 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
     }
 
     public func deleteAllAndWait() throws -> Int {
-        let request = NSFetchRequest<NSManagedObjectID>(entityName: Entity.entity().name ?? String(describing: Entity.self))
+        let request = createRequest(withResultType: NSManagedObjectID.self)
         request.resultType = .managedObjectIDResultType
 
         return try contextProvider.mainContext.sync { context -> Int in
@@ -198,7 +199,7 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
 
     public func add(item: Entity, completion: @escaping (Result<Entity, Error>) -> Void) {
         guard item.managedObjectContext != contextProvider.mainContext else {
-            completion(.success(item))
+            completion(.success(item)) // Already part of the correct context
             return
         }
 
@@ -222,15 +223,20 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
             return result
         }
     }
+
+    func createRequest<T>(withResultType resultType: T.Type) -> NSFetchRequest<T> {
+        return NSFetchRequest(entityName: Entity.entity().name ?? String(describing: Entity.self))
+    }
 }
 
-extension NSManagedObjectContext {
+private extension NSManagedObjectContext {
+
     func saveIfNeeded() throws {
         guard hasChanges else { return }
         try save()
     }
 
-    // This isn't nice but we because performAndWait doesn't rethrow then we need to dot it...
+    // This isn't nice but we because performAndWait doesn't rethrow then we need to do this...
     func sync<T>(_ task: (NSManagedObjectContext) throws -> T) throws -> T {
         var result: Result<T,Error>? = nil
         performAndWait {

@@ -4,7 +4,9 @@ import PackageDescription
 let package = Package(
     name: "Croupier",
     platforms: [
-        .iOS(.v13)
+        .iOS(.v13),
+        .macOS(.v10_12),
+        .watchOS(.v3)
     ],
     products: [
         .library(
@@ -14,5 +16,6 @@ let package = Package(
     targets: [
         .target(name: "Croupier", dependencies: [], path: "Croupier"),
 //        .testTarget(name: "CroupierTests", dependencies: ["Croupier"]),
-    ]
+    ],
+    swiftLanguageVersions: [.v5]
 )

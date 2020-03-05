@@ -13,33 +13,37 @@ public protocol Fetching {
 }
 
 public extension Fetching {
-    func getFirstAndWait(predicate: NSPredicate? = nil) throws -> Entity {
-        let results: [Entity]
-        if let filter = predicate {
-            results = try getAndWait(predicate: filter)
-        } else {
-            results = try getAllAndWait()
-        }
+    func getFirstAndWait() throws -> Entity {
+        let results = try getAllAndWait()
         guard let item = results.first else { throw RepositoryError.notFound }
         return item
     }
 
-    func getFirst(predicate: NSPredicate? = nil,
-                  completion: @escaping (Result<Entity, Error>) -> Void) {
-        let handler = { (result: Result<[Entity],Error>) in
+    func getFirstAndWait(predicate: NSPredicate) throws -> Entity {
+        let results = try getAndWait(predicate: predicate)
+        guard let item = results.first else { throw RepositoryError.notFound }
+        return item
+    }
+
+    func getFirst(predicate: NSPredicate, completion: @escaping (Result<Entity, Error>) -> Void) {
+        get(predicate: predicate) { result in
             completion(
-                result.flatMap { items -> Result<Entity, Error> in
-                    guard let item = items.first else {
-                        return .failure(RepositoryError.notFound)
-                    }
+                result.flatMap{ items -> Result<Entity, Error> in
+                    guard let item = items.first else { return .failure(RepositoryError.notFound) }
                     return .success(item)
                 }
             )
         }
-        if let filter = predicate {
-            get(predicate: filter, completion: handler)
-        } else {
-            getAll(completion: handler)
+    }
+
+    func getFirst(completion: @escaping (Result<Entity, Error>) -> Void) {
+        getAll { result in
+            completion(
+                result.flatMap{ items -> Result<Entity, Error> in
+                    guard let item = items.first else { return .failure(RepositoryError.notFound) }
+                    return .success(item)
+                }
+            )
         }
     }
 }
