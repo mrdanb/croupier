@@ -1,7 +1,5 @@
 #  Croupier 🃏
 
-#### ⚠️ This is a pre-alpha library currently under development ⚠️
-
 ### The repository pattern library
 Here to assist you your swift development by syncing, fetching and deleting your entity classes.
 
@@ -9,26 +7,23 @@ Here to assist you your swift development by syncing, fetching and deleting your
 
 ### 🗃 CoreData
 ```swift
-// Setup your CoreData stack as usual.
+// 1. Setup your CoreData stack as usual.
 let context = persistentContainer.viewContext
 context.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
 
-// Create a `Source` for your data. In this case we will use Croupier's `HTTPSource`.
-let url = URL(string: "http://www.example.api.com/")!
+// 2. Create a `Source` for your data. In this case we will use Croupier's `HTTPSource`.
+let url = URL(string: "http://www.mocky.io/v2/")!
 let source = HTTPSource(baseURL: url)
 
-/*
- Initialize the repository.
-
- Here you need to declare your response and entity types.
- For this example we are using `ConfigurationResponse` and `Configuration` in your implementation these will be different.
-
- As well as the source and context you will need to set the identifier for the repository.
- This is the name of the property that will be used to match the key against when fetching entities.
-*/
-let repository = CoreDataRepository<GamesResponse, Game>(source: source, 
-                                                         context: context, 
-                                                         identifier: "identifier")
+// 3. Initialize the repository.
+// Here you will need to declare your response and entity types.
+// For this example we are using `UserResponse` and `User` in your implementation these might be different.
+//
+// As well as the response and entity types you will need to provide a `ContextProvider`.
+// This is a very simple protocol that is capable of providing a `mainContext` as well as
+// creating a new background context. Here we are simply providing the persistentContainer as we have
+// extended `NSPersistentContainer` to act as a `ContextProvider` (see below).
+repository = CoreDataRepository<UserResponse, User>(source: source, contextProvider: persistentContainer)
 
 ```
 
@@ -41,16 +36,16 @@ let repository = CoreDataRepository<GamesResponse, Game>(source: source,
 ```swift
 let repository: AnyRepository<Response, User> = …
 
-repository.get(forKey: "example-identifier") { (result) in
+repository.getAll() { result in
     switch result {
-    case .success(let item): // Use item of type `User`
+    case .success(let items): // ..items are of type `[User]`
     case .failure(let error): // handle error
     }
 }
 
-repository.getAll { (result) in
+repository.getFirst(predicate: NSPredicate(format: "identifier = %@", "3y7oef0fef")) { result in
     switch result {
-    case .success(let items): // Use items of type `[User]`
+    case .success(let item): // .. item is of type [User`
     case .failure(let error): // Handle error
     }
 }
@@ -60,7 +55,7 @@ repository.getAll { (result) in
 ```swift
 let repository: AnyRepository<Response, User> = …
 
-repository.sync(from: "/users/example-identifier") { (result) in
+repository.sync(from: "/users/example-identifier") { result in
     switch result {
     case .success(let changes): // Handle changes - represented by type `Changes<User>`
     case .failure(let error): // Handle error
@@ -74,7 +69,7 @@ repository.sync(from: "/users/example-identifier") { (result) in
 let repository: AnyRepository<Response, User> = …
 
 let item: User
-repository.delete(item: item) { (result) in
+repository.delete(item: user) { result in
     switch result {
     case .success(let item): // Handle item of type `User`
     case .failure(let error): // Handle error

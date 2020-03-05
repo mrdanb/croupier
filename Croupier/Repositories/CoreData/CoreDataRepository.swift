@@ -25,10 +25,10 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
         self.contextProvider = contextProvider
         self.responseDecoder = responseDecoder
 
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(objectsDidChange),
-                                               name: .NSManagedObjectContextObjectsDidChange,
-                                               object: contextProvider.mainContext)
+//        NotificationCenter.default.addObserver(self,
+//                                               selector: #selector(objectsDidChange),
+//                                               name: .NSManagedObjectContextObjectsDidChange,
+//                                               object: contextProvider.mainContext)
     }
 
     @objc func objectsDidChange(notification: NSNotification) {
@@ -97,6 +97,7 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
     private func serialize(data: Data) throws -> [Entity] {
         let response = try responseDecoder.decode(Response.self, from: data)
         let backgroundContext = contextProvider.newBackgroundContext()
+        registerObserver(for: backgroundContext)
         backgroundContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
         let entities = try backgroundContext.sync { context -> [Entity] in
             var items = [Entity]()
@@ -107,6 +108,13 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
             return items
         }
         return entities
+    }
+
+    private func registerObserver(for context: NSManagedObjectContext) {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(objectsDidChange),
+                                               name: .NSManagedObjectContextObjectsDidChange,
+                                               object: context)
     }
 
     public func sync(from path: String,
