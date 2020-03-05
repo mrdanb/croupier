@@ -4,9 +4,9 @@ import Croupier
 
 class ViewController: UIViewController {
 
-    lazy var persistentContainer: NSPersistentContainer = {
+    private lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "CroupierExample")
-        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+        container.loadPersistentStores(completionHandler: { storeDescription, error in
             if let error = error as NSError? {
                 fatalError("Unresolved error \(error), \(error.userInfo)")
             }
@@ -14,80 +14,96 @@ class ViewController: UIViewController {
         return container
     }()
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    var repository: CoreDataRepository<UserResponse, User>?
 
-        // Setup your CoreData stack as usual.
+    override func awakeFromNib() {
+        super.awakeFromNib()
+
+        // 1. Setup your CoreData stack as usual.
         let context = persistentContainer.viewContext
         context.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
 
-        // Create a `Source` for your data. In this case we will use Croupier's `HTTPSource`.
+        // 2. Create a `Source` for your data. In this case we will use Croupier's `HTTPSource`.
         let url = URL(string: "http://www.mocky.io/v2/")!
         let source = HTTPSource(baseURL: url)
 
-        /*
-         Initialize the repository.
+        // 3. Initialize the repository.
+        // Here you will need to declare your response and entity types.
+        // For this example we are using `UserResponse` and `User` in your implementation these might be different.
+        //
+        // As well as the response and entity types you will need to provide a `ContextProvider`.
+        // This is a very simple protocol that is capable of providing a `mainContext` as well as
+        // creating a new background context. Here we are simply providing the persistentContainer as we have
+        // extended `NSPersistentContainer` to act as a `ContextProvider` (see below).
+        repository = CoreDataRepository<UserResponse, User>(source: source, contextProvider: persistentContainer)
+    }
 
-         Here you need to declare your response and entity types.
-         For this example we are using `ConfigurationResponse` and `Configuration` in your implementation these will be different.
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        sync()
+    }
 
-         As well as the source and context you will need to set the identifier for the repository.
-         This is the name of the property that will be used to match the key against when fetching entities.
-         */
-        let repository = CoreDataRepository<GamesResponse, Game>(source: source,
-                                                                 contextProvider: persistentContainer,
-                                                                 identifier: "identifier")
-        repository.sync(from: "5d8beb5d350000f745d472a1") { (result) in
+    private func sync() {
+        repository?.sync(from: "5e617f9b3000005400762c43") { result in
             switch result {
-            case .success(let changes):
-                print(changes)
+            case .success:
+                self.fetch()
             case .failure(let error):
                 print(error)
             }
         }
     }
+
+    private func fetch() {
+        guard let result = try? repository?.getAllAndWait() else { return }
+        print(result)
+
+        repository?.delete(item: <#T##User#>, completion: <#T##(Result<User, Error>) -> Void#>)
+    }
+
+    @IBAction func performSync(_ sender: UIButton) {
+        sync()
+    }
 }
 
+// Extend `NSPersistentContainer` so it can act as a `ContextProvider`.
 extension NSPersistentContainer: ContextProvider {
     public var mainContext: NSManagedObjectContext {
         return viewContext
     }
 }
 
-struct GamesResponse: Decodable {
-    let games: [GameResponse]
+struct UserResponse: Decodable {
+    let identifier: String
+    let name: String
+    let age: Int
 }
 
-extension GamesResponse: Serializable {
+extension UserResponse: Serializable {
     func serialize(context: NSManagedObjectContext?,
-                   store: (Game) -> Void) {
+                   store: (User) -> Void) {
         guard let context = context else { return }
-        games.forEach { (response) in
-            if let game = NSEntityDescription.insertNewObject(forEntityName: "Game", into: context) as? Game {
-                game.update(response)
-                store(game)
-            }
-        }
+        let user = User(context: context, response: self)
+        store(user)
     }
 }
 
-struct GameResponse: Decodable {
-    let identifier: String
-    let name: String
-}
-
-struct Configuration: Equatable, Decodable, Serializable {
-    let isValid: Bool
-    let versionNumber: String
-}
-
-@objc(Game)
-class Game: NSManagedObject {
+@objc(User)
+class User: NSManagedObject {
     @NSManaged var identifier: String
     @NSManaged var name: String
+    @NSManaged var age: NSNumber
 
-    func update(_ game: GameResponse) {
-        self.identifier = game.identifier
-        self.name = game.name
+    func update(_ response: UserResponse) {
+        identifier = response.identifier
+        name = response.name
+        age = NSNumber(value: response.age)
+    }
+}
+
+extension User {
+    convenience init(context: NSManagedObjectContext, response: UserResponse) {
+        self.init(context: context)
+        update(response)
     }
 }
