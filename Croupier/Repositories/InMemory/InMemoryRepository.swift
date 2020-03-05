@@ -13,28 +13,29 @@ public final class InMemoryRepository<Response, Entity>: Repository where Entity
     }
 
     public func sync(from path: String, completion: @escaping (Result<Changes<Entity>,Error>) -> Void) {
-        source.data(for: path, parameters: nil) { (data) in
-            DispatchQueue(label: "uk.co.dollop.decode.queue").async {
-                let result = data.flatMap({ (data) -> Result<Changes<Entity>,Error> in
+        source.data(for: path, parameters: nil) { data in
+            DispatchQueue(label: "uk.co.dollop.decode.queue").async { [weak self] in
+                guard let `self` = self else { return }
+                let result = data.flatMap { data -> Result<Changes<Entity>,Error> in
                     do {
                         let response = try self.responseDecoder.decode(Response.self, from: data)
                         let snapshot = self.store
-                        response.serialize(context: nil, store: { entity in
+                        response.serialize(context: nil) { entity in
                             self.store.append(entity)
-                        })
-                        let changes = self.createDiff(previous: snapshot, new: self.store)
+                        }
+                        let changes = self.changes(from: snapshot, to: self.store)
                         return .success(changes)
                     } catch {
                         return .failure(error)
                     }
-                })
+                }
                 DispatchQueue.main.async { completion(result) }
             }
         }
     }
 
-    private func createDiff(previous: [Entity], new: [Entity]) -> Changes<Entity> {
-        let diff = new.difference(from: previous)
+    private func changes(from: [Entity], to: [Entity]) -> Changes<Entity> {
+        let diff = to.difference(from: from)
         return Changes<Entity>(diff)
     }
 
@@ -62,7 +63,7 @@ public final class InMemoryRepository<Response, Entity>: Repository where Entity
 
     public func deleteAll(completion: @escaping (Result<Int, Error>) -> Void) {
         let count = store.count
-        store = []
+        store.removeAll()
         completion(.success(count))
     }
 
@@ -73,7 +74,7 @@ public final class InMemoryRepository<Response, Entity>: Repository where Entity
 
     public func deleteAllAndWait() throws -> Int {
         let count = store.count
-        store = []
+        store.removeAll()
         return count
     }
 
