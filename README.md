@@ -22,14 +22,29 @@ let source = HTTPSource(baseURL: url)
 // As well as the response and entity types you will need to provide a `ContextProvider`.
 // This is a very simple protocol that is capable of providing a `mainContext` as well as
 // creating a new background context. Here we are simply providing the persistentContainer as we have
-// extended `NSPersistentContainer` to act as a `ContextProvider` (see below).
-repository = CoreDataRepository<UserResponse, User>(source: source, contextProvider: persistentContainer)
-
+// extended `NSPersistentContainer` to act as a `ContextProvider`.
+let repository = CoreDataRepository<UserResponse, User>(source: source, contextProvider: persistentContainer)
 ```
 
 ### 📱 In-memory
-```
- Coming soon...
+```swift
+// 1. In order to setup an in-memory repository you need to provide a `Source`.
+// In this example we have extended `UserDefaults` to implement Croupier's `Source` protocol.
+// This allows us to pass in`UserDefaults` to the in-memory repository.
+
+let repository = InMemoryRepository<UserResponse, User>(source: UserDefaults.standard)
+
+extension UserDefaults: Source {
+    public func data(for key: String,
+                     parameters: [String : String]? = nil,
+                     completion: @escaping (Result<Data, Error>) -> Void) {
+        guard let data = self.data(forKey: key) else {
+            completion(.failure(RepositoryError.notFound))
+            return
+        }
+        completion(.success(data))
+    }
+}
 ```
 
 ## Fetching
@@ -45,7 +60,7 @@ repository.getAll() { result in
 
 repository.getFirst(predicate: NSPredicate(format: "identifier = %@", "3y7oef0fef")) { result in
     switch result {
-    case .success(let item): // .. item is of type [User`
+    case .success(let item): // .. item is of type `User`
     case .failure(let error): // Handle error
     }
 }
@@ -61,7 +76,6 @@ repository.sync(from: "/users/example-identifier") { result in
     case .failure(let error): // Handle error
     }
 }
-
 ```
 
 ## Deleting
