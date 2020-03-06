@@ -47,7 +47,7 @@ extension UserDefaults: Source {
 }
 ```
 
-## Syncing
+## 🔄 Syncing
 Syncing allows you to update your repository with data from a given source. 
 When you ask Croupier to `sync` it will:
 * Ask the source you provided to return some `Data` for a given key
@@ -67,7 +67,7 @@ repository.sync(from: "/users/example-identifier") { result in
 }
 ```
 
-## Fetching
+## ⬇️ Fetching
 ```swift
 let repository: AnyRepository<Response, User> = …
 
@@ -86,7 +86,7 @@ repository.getFirst(predicate: NSPredicate(format: "identifier = %@", "3y7oef0fe
 }
 ```
 
-## Deleting
+## 🗑 Deleting
 ```swift
 let repository: AnyRepository<Response, User> = …
 
@@ -99,7 +99,7 @@ repository.delete(item: user) { result in
 }
 ```
 
-## Changes
+## 🔀 Changes
 
 When performing a sync the result success type will be a `Changes` object.
 ```swift
