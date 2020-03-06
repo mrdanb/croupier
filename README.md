@@ -47,6 +47,26 @@ extension UserDefaults: Source {
 }
 ```
 
+## Syncing
+Syncing allows you to update your repository with data from a given source. 
+When you ask Croupier to `sync` it will:
+* Ask the source you provided to return some `Data` for a given key
+* Serialise that data in to your  `Entity` type
+* Store the results
+
+The result is a `Changes` object listing what has been added, updated or deleted. See [Changes](#Changes)
+
+```swift
+let repository: AnyRepository<Response, User> = …
+
+repository.sync(from: "/users/example-identifier") { result in
+    switch result {
+    case .success(let changes): // Handle changes - represented by type `Changes<User>`
+    case .failure(let error): // Handle error
+    }
+}
+```
+
 ## Fetching
 ```swift
 let repository: AnyRepository<Response, User> = …
@@ -61,18 +81,6 @@ repository.getAll() { result in
 repository.getFirst(predicate: NSPredicate(format: "identifier = %@", "3y7oef0fef")) { result in
     switch result {
     case .success(let item): // .. item is of type `User`
-    case .failure(let error): // Handle error
-    }
-}
-```
-
-## Syncing
-```swift
-let repository: AnyRepository<Response, User> = …
-
-repository.sync(from: "/users/example-identifier") { result in
-    switch result {
-    case .success(let changes): // Handle changes - represented by type `Changes<User>`
     case .failure(let error): // Handle error
     }
 }
