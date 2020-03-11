@@ -3,8 +3,12 @@
 ### The repository pattern library
 Here to assist your swift development by syncing, fetching and deleting your entity classes.
 
-- [Installation](#Installation)
-- [Setup](#Setup)
+- [Installation](#installation)
+- [Setup](#setup)
+- [Fetching](#fetching)
+- [Syncing](#syncing)
+- [Deleting](#deleting)
+- [Changes](#changes)
 
 ## Installation
 
