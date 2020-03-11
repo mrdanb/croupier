@@ -1,7 +1,24 @@
 #  Croupier 🃏
 
 ### The repository pattern library
-Here to assist you your swift development by syncing, fetching and deleting your entity classes.
+Here to assist your swift development by syncing, fetching and deleting your entity classes.
+
+- [Installation](#Installation)
+- [Setup](#Setup)
+
+## Installation
+
+### Swift Package Manager
+
+Install via [Swift Package Manager](https://swift.org/package-manager/).
+
+Use Croupier as a dependency by adding it to the `dependencies` value of your `Package.swift`.
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/mrdanb/croupier.git", .upToNextMajor(from: "1.0.0"))
+]
+```
 
 ## Setup
 
