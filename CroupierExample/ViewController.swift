@@ -55,10 +55,10 @@ class ViewController: UIViewController {
     }
 
     private func fetch() {
-        guard let result = try? repository?.getAllAndWait() else { return }
-        print(result)
+        if let results = try? repository?.getAllAndWait() {
+            print(results)
+        }
 
-        repository?.delete(item: <#T##User#>, completion: <#T##(Result<User, Error>) -> Void#>)
     }
 
     @IBAction func performSync(_ sender: UIButton) {
