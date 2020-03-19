@@ -1,3 +1,6 @@
 import Foundation
 
-public typealias Repository = Fetching & Syncing & Deleting & Adding
+public protocol Repository: Fetching, Syncing, Deleting, Adding {
+    associatedtype Entity
+    associatedtype Response
+}
