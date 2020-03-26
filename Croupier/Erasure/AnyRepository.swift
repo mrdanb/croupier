@@ -36,7 +36,7 @@ public struct AnyRepository<Response,Entity>: Repository where Response: Seriali
     }
 
     public func getAndWait(predicate: NSPredicate) throws -> [Entity] {
-        return try getAndWait(predicate: predicate)
+        return try _getAndWait(predicate)
     }
 
     public func getAllAndWait() throws -> [Entity] {
