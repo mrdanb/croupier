@@ -24,11 +24,6 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
         self.source = source
         self.contextProvider = contextProvider
         self.responseDecoder = responseDecoder
-
-//        NotificationCenter.default.addObserver(self,
-//                                               selector: #selector(objectsDidChange),
-//                                               name: .NSManagedObjectContextObjectsDidChange,
-//                                               object: contextProvider.mainContext)
     }
 
     @objc func objectsDidChange(notification: NSNotification) {
@@ -206,17 +201,14 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
     }
 
     public func add(item: Entity, completion: @escaping (Result<Entity, Error>) -> Void) {
-        guard item.managedObjectContext != contextProvider.mainContext else {
-            completion(.success(item)) // Already part of the correct context
-            return
+        if item.managedObjectContext != contextProvider.mainContext {
+            contextProvider.mainContext.insert(item)
         }
 
-        let description = item.entity
-        let result = Entity(entity: description, insertInto: contextProvider.mainContext)
         contextProvider.mainContext.perform {
             do {
                 try self.contextProvider.mainContext.saveIfNeeded()
-                completion(.success(result))
+                completion(.success(item))
             } catch {
                 completion(.failure(error))
             }
@@ -224,11 +216,12 @@ public class CoreDataRepository<Response,Entity>: Repository where Response: Ser
     }
 
     public func addAndWait(item: Entity) throws -> Entity {
-        let description = item.entity
-        let result = Entity(entity: description, insertInto: contextProvider.mainContext)
+        if item.managedObjectContext != contextProvider.mainContext {
+            contextProvider.mainContext.insert(item)
+        }
         return try contextProvider.mainContext.sync { context -> Entity in
             try context.saveIfNeeded()
-            return result
+            return item
         }
     }
 
